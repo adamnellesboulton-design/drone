@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NES Drone — 2A03 Rehearsal Tool</title>
+<style>
+  :root {
+    --bg: #0d0d1a;
+    --panel: #13132a;
+    --border: #2a2a5a;
+    --accent: #5555ff;
+    --accent2: #00ccaa;
+    --pulse1: #ff6644;
+    --pulse2: #ffaa22;
+    --tri: #44ddbb;
+    --text: #ccccee;
+    --muted: #555577;
+    --warn: #ff4444;
+    --green: #44ff88;
+    --font: 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px;
+  }
+
+  .panel-title {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-title.p1 { color: var(--pulse1); border-color: var(--pulse1); }
+  .panel-title.p2 { color: var(--pulse2); border-color: var(--pulse2); }
+  .panel-title.tri { color: var(--tri); border-color: var(--tri); }
+  .panel-title.ctrl { color: var(--accent2); border-color: var(--accent2); }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  .field label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  input[type=number], input[type=range], select {
+    background: #1a1a33;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 2px;
+    width: 100%;
+    outline: none;
+  }
+  input[type=number]:focus, select:focus {
+    border-color: var(--accent);
+  }
+  input[type=range] {
+    padding: 0;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .row label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .toggle {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .toggle input { display: none; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #222240;
+    border-radius: 2px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+  .toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 12px;
+    left: 2px;
+    top: 3px;
+    background: #fff;
+    border-radius: 1px;
+    transition: transform 0.15s;
+  }
+  .toggle input:checked + .toggle-slider::after { transform: translateX(16px); }
+
+  .readout {
+    background: #0a0a18;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 8px;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .readout-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .readout-label { color: var(--muted); }
+  .readout-val { color: var(--accent2); text-align: right; }
+  .readout-val.warn { color: var(--warn); }
+  .readout-val.ok { color: var(--green); }
+
+  .btn {
+    background: #1a1a33;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .btn:hover { background: #22224a; border-color: var(--accent); }
+  .btn.start { border-color: var(--green); color: var(--green); font-size: 14px; letter-spacing: 2px; }
+  .btn.stop  { border-color: var(--warn); color: var(--warn); font-size: 14px; letter-spacing: 2px; }
+  .btn.sa-pa { border-color: var(--accent2); color: var(--accent2); }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    margin-right: 6px;
+    transition: background 0.2s;
+  }
+  .status-dot.running { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+  .vol-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .vol-row label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; min-width: 70px; }
+  .vol-val { font-size: 12px; color: var(--accent2); min-width: 28px; text-align: right; }
+
+  .duty-btns {
+    display: flex;
+    gap: 4px;
+  }
+  .duty-btn {
+    flex: 1;
+    background: #1a1a33;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 5px 2px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .duty-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .sep { height: 1px; background: var(--border); margin: 10px 0; }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>&#x25BA; NES Drone</h1>
+<p class="subtitle">NTSC 2A03 · Rehearsal Tool · Sa–Pa Tanpura</p>
+
+<div class="main-grid">
+
+  <!-- CONTROL PANEL -->
+  <div class="panel">
+    <div class="panel-title ctrl">Master Control</div>
+
+    <div style="text-align:center;margin-bottom:12px;">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText" style="font-size:11px;color:var(--muted);">STOPPED</span>
+    </div>
+
+    <button class="btn start" id="startBtn">▶ START</button>
+    <button class="btn stop" id="stopBtn" style="display:none">■ STOP</button>
+
+    <div class="sep"></div>
+
+    <div class="vol-row">
+      <label>Master Vol</label>
+      <input type="range" id="masterVol" min="0" max="1" step="0.01" value="0.8">
+      <span class="vol-val" id="masterVolVal">0.80</span>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="field">
+      <label>Base Sa (Hz)</label>
+      <input type="number" id="baseSa" value="146.83" step="0.01" min="27.3" max="2000">
+    </div>
+    <button class="btn sa-pa" id="setSaPaBtn">Set Sa–Pa Drone</button>
+
+    <div class="sep"></div>
+
+    <div class="field">
+      <label>Vibrato Depth (cents)</label>
+      <div class="vol-row" style="margin-bottom:0">
+        <input type="range" id="vibDepth" min="0" max="20" step="0.5" value="0">
+        <span class="vol-val" id="vibDepthVal">0</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Vibrato Rate (Hz)</label>
+      <div class="vol-row" style="margin-bottom:0">
+        <input type="range" id="vibRate" min="0.5" max="12" step="0.1" value="5">
+        <span class="vol-val" id="vibRateVal">5.0</span>
+      </div>
+    </div>
+    <p style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:4px;">
+      ∿ Smoothed LFO approximation — real NES vibrato steps at 60 Hz frame rate.
+    </p>
+  </div>
+
+  <!-- TRIANGLE -->
+  <div class="panel">
+    <div class="panel-title tri">Triangle Channel</div>
+
+    <div class="row">
+      <label>On</label>
+      <label class="toggle">
+        <input type="checkbox" id="triOn" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label>Target Freq (Hz)</label>
+      <input type="number" id="triFreq" value="73.415" step="0.001" min="0.01" max="10000">
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="readout" id="triReadout">
+      <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="triPeriod">—</span></div>
+      <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="triActual">—</span></div>
+      <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="triCents">—</span></div>
+      <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="triMuted">—</span></div>
+    </div>
+
+    <div class="sep"></div>
+    <p style="font-size:10px;color:var(--muted);line-height:1.5;">
+      32-step 4-bit waveform · No volume control · Muted when t &lt; 2.
+      Lowest: ~27.3 Hz (t=2047).
+    </p>
+  </div>
+
+  <!-- PULSE 1 -->
+  <div class="panel">
+    <div class="panel-title p1">Pulse 1</div>
+
+    <div class="row">
+      <label>On</label>
+      <label class="toggle">
+        <input type="checkbox" id="p1On" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label>Target Freq (Hz)</label>
+      <input type="number" id="p1Freq" value="146.83" step="0.001" min="0.01" max="10000">
+    </div>
+
+    <div class="field">
+      <label>Duty Cycle</label>
+      <div class="duty-btns" id="p1DutyBtns">
+        <button class="duty-btn" data-duty="0.125">12.5%</button>
+        <button class="duty-btn" data-duty="0.25">25%</button>
+        <button class="duty-btn active" data-duty="0.5">50%</button>
+      </div>
+    </div>
+
+    <div class="vol-row">
+      <label>Volume (0–15)</label>
+      <input type="range" id="p1Vol" min="0" max="15" step="1" value="10">
+      <span class="vol-val" id="p1VolVal">10</span>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="readout">
+      <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="p1Period">—</span></div>
+      <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="p1Actual">—</span></div>
+      <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="p1Cents">—</span></div>
+      <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="p1Muted">—</span></div>
+    </div>
+
+    <div class="sep"></div>
+    <p style="font-size:10px;color:var(--muted);line-height:1.5;">
+      11-bit timer · 4-bit volume · Muted when t &lt; 8.
+      Lowest: ~54.6 Hz (t=2047).
+    </p>
+  </div>
+
+  <!-- PULSE 2 -->
+  <div class="panel">
+    <div class="panel-title p2">Pulse 2</div>
+
+    <div class="row">
+      <label>On</label>
+      <label class="toggle">
+        <input type="checkbox" id="p2On" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label>Target Freq (Hz)</label>
+      <input type="number" id="p2Freq" value="220.245" step="0.001" min="0.01" max="10000">
+    </div>
+
+    <div class="field">
+      <label>Duty Cycle</label>
+      <div class="duty-btns" id="p2DutyBtns">
+        <button class="duty-btn" data-duty="0.125">12.5%</button>
+        <button class="duty-btn active" data-duty="0.25">25%</button>
+        <button class="duty-btn" data-duty="0.5">50%</button>
+      </div>
+    </div>
+
+    <div class="vol-row">
+      <label>Volume (0–15)</label>
+      <input type="range" id="p2Vol" min="0" max="15" step="1" value="8">
+      <span class="vol-val" id="p2VolVal">8</span>
+    </div>
+
+    <div class="field" style="margin-top:4px">
+      <label>Detune (cents ±25)</label>
+      <div class="vol-row" style="margin-bottom:0">
+        <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="0">
+        <span class="vol-val" id="p2DetuneVal">+0</span>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="readout">
+      <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="p2Period">—</span></div>
+      <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="p2Actual">—</span></div>
+      <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="p2Cents">—</span></div>
+      <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="p2Muted">—</span></div>
+    </div>
+
+    <div class="sep"></div>
+    <p style="font-size:10px;color:var(--muted);line-height:1.5;">
+      Detune shifts the target before period snap — creates beating shimmer.
+    </p>
+  </div>
+
+</div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────
+const CPU = 1789773;
+
+function freqToPulsePeriod(f) {
+  return Math.round(CPU / (16 * f) - 1);
+}
+function freqToTriPeriod(f) {
+  return Math.round(CPU / (32 * f) - 1);
+}
+function pulseActualFreq(t) {
+  return CPU / (16 * (t + 1));
+}
+function triActualFreq(t) {
+  return CPU / (32 * (t + 1));
+}
+function cents(actual, target) {
+  return 1200 * Math.log2(actual / target);
+}
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function detunedFreq(f, c) { return f * Math.pow(2, c / 1200); }
+
+// ── State ──────────────────────────────────────────────────
+const state = {
+  running: false,
+  masterVolume: 0.8,
+  vibratoDepth: 0,
+  vibratoRate: 5,
+  triangle: { on: true, freq: 73.415 },
+  pulse1: { on: true, freq: 146.83, duty: 0.5, vol: 10, detuneCents: 0 },
+  pulse2: { on: true, freq: 220.245, duty: 0.25, vol: 8, detuneCents: 0 },
+};
+
+// ── Audio ──────────────────────────────────────────────────
+let audioCtx = null;
+let workletNode = null;
+
+async function startAudio() {
+  if (audioCtx) return;
+  audioCtx = new AudioContext({ latencyHint: 'interactive' });
+  await audioCtx.audioWorklet.addModule('nes-worklet.js');
+  workletNode = new AudioWorkletNode(audioCtx, 'nes-processor', {
+    numberOfInputs: 0,
+    numberOfOutputs: 1,
+    outputChannelCount: [1],
+  });
+  workletNode.connect(audioCtx.destination);
+  sendParams();
+}
+
+function sendParams() {
+  if (!workletNode) return;
+  workletNode.port.postMessage({
+    type: 'params',
+    params: {
+      masterVolume: state.masterVolume,
+      vibratoDepth: state.vibratoDepth,
+      vibratoRate: state.vibratoRate,
+      pulse1: { ...state.pulse1 },
+      pulse2: { ...state.pulse2 },
+      triangle: { ...state.triangle },
+    }
+  });
+}
+
+function stopAudio() {
+  if (workletNode) { workletNode.disconnect(); workletNode = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+}
+
+// ── Readout update ─────────────────────────────────────────
+function updateReadouts() {
+  // Triangle
+  {
+    const f = state.triangle.freq;
+    const t = clamp(freqToTriPeriod(f), 0, 2047);
+    const muted = !state.triangle.on || t < 2;
+    const actual = triActualFreq(t);
+    const err = cents(actual, f);
+    document.getElementById('triPeriod').textContent = t;
+    document.getElementById('triActual').textContent = actual.toFixed(3) + ' Hz';
+    const cEl = document.getElementById('triCents');
+    cEl.textContent = (err >= 0 ? '+' : '') + err.toFixed(1) + ' ¢';
+    cEl.className = 'readout-val ' + (Math.abs(err) < 1 ? 'ok' : 'warn');
+    const mEl = document.getElementById('triMuted');
+    mEl.textContent = muted ? (t < 2 ? 'MUTED (t<2)' : 'OFF') : 'ACTIVE';
+    mEl.className = 'readout-val ' + (muted ? 'warn' : 'ok');
+  }
+
+  // Pulse 1
+  {
+    const f = detunedFreq(state.pulse1.freq, state.pulse1.detuneCents);
+    const t = clamp(freqToPulsePeriod(f), 0, 2047);
+    const muted = !state.pulse1.on || t < 8;
+    const actual = pulseActualFreq(t);
+    const err = cents(actual, f);
+    document.getElementById('p1Period').textContent = t;
+    document.getElementById('p1Actual').textContent = actual.toFixed(3) + ' Hz';
+    const cEl = document.getElementById('p1Cents');
+    cEl.textContent = (err >= 0 ? '+' : '') + err.toFixed(1) + ' ¢';
+    cEl.className = 'readout-val ' + (Math.abs(err) < 1 ? 'ok' : 'warn');
+    const mEl = document.getElementById('p1Muted');
+    mEl.textContent = muted ? (t < 8 ? 'MUTED (t<8)' : 'OFF') : 'ACTIVE';
+    mEl.className = 'readout-val ' + (muted ? 'warn' : 'ok');
+  }
+
+  // Pulse 2
+  {
+    const f = detunedFreq(state.pulse2.freq, state.pulse2.detuneCents);
+    const t = clamp(freqToPulsePeriod(f), 0, 2047);
+    const muted = !state.pulse2.on || t < 8;
+    const actual = pulseActualFreq(t);
+    const err = cents(actual, f);
+    document.getElementById('p2Period').textContent = t;
+    document.getElementById('p2Actual').textContent = actual.toFixed(3) + ' Hz';
+    const cEl = document.getElementById('p2Cents');
+    cEl.textContent = (err >= 0 ? '+' : '') + err.toFixed(1) + ' ¢';
+    cEl.className = 'readout-val ' + (Math.abs(err) < 1 ? 'ok' : 'warn');
+    const mEl = document.getElementById('p2Muted');
+    mEl.textContent = muted ? (t < 8 ? 'MUTED (t<8)' : 'OFF') : 'ACTIVE';
+    mEl.className = 'readout-val ' + (muted ? 'warn' : 'ok');
+  }
+}
+
+// ── UI helpers ─────────────────────────────────────────────
+function setStatus(running) {
+  state.running = running;
+  document.getElementById('statusDot').className = 'status-dot' + (running ? ' running' : '');
+  document.getElementById('statusText').textContent = running ? 'RUNNING' : 'STOPPED';
+  document.getElementById('statusText').style.color = running ? 'var(--green)' : 'var(--muted)';
+  document.getElementById('startBtn').style.display = running ? 'none' : 'block';
+  document.getElementById('stopBtn').style.display = running ? 'block' : 'none';
+}
+
+function setupDutyButtons(containerId, channel) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.duty-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.duty-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      channel.duty = parseFloat(btn.dataset.duty);
+      sendParams();
+    });
+  });
+}
+
+// ── Wire up controls ───────────────────────────────────────
+document.getElementById('startBtn').addEventListener('click', async () => {
+  await startAudio();
+  setStatus(true);
+  updateReadouts();
+});
+
+document.getElementById('stopBtn').addEventListener('click', () => {
+  stopAudio();
+  setStatus(false);
+});
+
+// Master volume
+const masterVolEl = document.getElementById('masterVol');
+masterVolEl.addEventListener('input', () => {
+  state.masterVolume = parseFloat(masterVolEl.value);
+  document.getElementById('masterVolVal').textContent = state.masterVolume.toFixed(2);
+  sendParams();
+});
+
+// Vibrato
+const vibDepthEl = document.getElementById('vibDepth');
+vibDepthEl.addEventListener('input', () => {
+  state.vibratoDepth = parseFloat(vibDepthEl.value);
+  document.getElementById('vibDepthVal').textContent = state.vibratoDepth.toFixed(1);
+  sendParams();
+});
+const vibRateEl = document.getElementById('vibRate');
+vibRateEl.addEventListener('input', () => {
+  state.vibratoRate = parseFloat(vibRateEl.value);
+  document.getElementById('vibRateVal').textContent = state.vibratoRate.toFixed(1);
+  sendParams();
+});
+
+// Triangle
+document.getElementById('triOn').addEventListener('change', e => {
+  state.triangle.on = e.target.checked;
+  sendParams(); updateReadouts();
+});
+document.getElementById('triFreq').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (!isNaN(v) && v > 0) { state.triangle.freq = v; sendParams(); updateReadouts(); }
+});
+
+// Pulse 1
+document.getElementById('p1On').addEventListener('change', e => {
+  state.pulse1.on = e.target.checked;
+  sendParams(); updateReadouts();
+});
+document.getElementById('p1Freq').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (!isNaN(v) && v > 0) { state.pulse1.freq = v; sendParams(); updateReadouts(); }
+});
+const p1VolEl = document.getElementById('p1Vol');
+p1VolEl.addEventListener('input', () => {
+  state.pulse1.vol = parseInt(p1VolEl.value);
+  document.getElementById('p1VolVal').textContent = state.pulse1.vol;
+  sendParams();
+});
+setupDutyButtons('p1DutyBtns', state.pulse1);
+
+// Pulse 2
+document.getElementById('p2On').addEventListener('change', e => {
+  state.pulse2.on = e.target.checked;
+  sendParams(); updateReadouts();
+});
+document.getElementById('p2Freq').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (!isNaN(v) && v > 0) { state.pulse2.freq = v; sendParams(); updateReadouts(); }
+});
+const p2VolEl = document.getElementById('p2Vol');
+p2VolEl.addEventListener('input', () => {
+  state.pulse2.vol = parseInt(p2VolEl.value);
+  document.getElementById('p2VolVal').textContent = state.pulse2.vol;
+  sendParams();
+});
+const p2DetuneEl = document.getElementById('p2Detune');
+p2DetuneEl.addEventListener('input', () => {
+  state.pulse2.detuneCents = parseFloat(p2DetuneEl.value);
+  const v = state.pulse2.detuneCents;
+  document.getElementById('p2DetuneVal').textContent = (v >= 0 ? '+' : '') + v.toFixed(1);
+  sendParams(); updateReadouts();
+});
+setupDutyButtons('p2DutyBtns', state.pulse2);
+
+// Sa–Pa button
+document.getElementById('setSaPaBtn').addEventListener('click', () => {
+  const sa = parseFloat(document.getElementById('baseSa').value);
+  if (isNaN(sa) || sa <= 0) return;
+
+  // Triangle = Sa / 2 (octave down)
+  state.triangle.freq = sa / 2;
+  document.getElementById('triFreq').value = (sa / 2).toFixed(3);
+
+  // Pulse 1 = Sa
+  state.pulse1.freq = sa;
+  document.getElementById('p1Freq').value = sa.toFixed(3);
+
+  // Pulse 2 = Sa * 1.5 (the fifth, Pa)
+  state.pulse2.freq = sa * 1.5;
+  document.getElementById('p2Freq').value = (sa * 1.5).toFixed(3);
+
+  sendParams();
+  updateReadouts();
+});
+
+// ── Init readouts on page load ─────────────────────────────
+updateReadouts();
+</script>
+</body>
+</html>
