@@ -468,7 +468,7 @@ input[type=number]:focus { border-color: var(--accent); }
     <b>Sa · Ma</b><span>Todi · Bhairavi · Marwa · Purvi</span>
   </button>
   <button class="preset-btn" data-preset="sa-ni-komal">
-    <b>Sa · Ni♭</b><span>Bhairav · Lalit · Ramkali</span>
+    <b>Sa · Ni♭</b><span>Kafi · Darbari · Asavari</span>
   </button>
   <button class="preset-btn" data-preset="sa-ni-shuddha">
     <b>Sa · Ni♮</b><span>Yaman · Kalyan · Bilawal</span>
@@ -558,8 +558,8 @@ input[type=number]:focus { border-color: var(--accent); }
           </div>
           <div class="ctrl-row">
             <label>VOL</label>
-            <input type="range" id="p1Vol" min="0" max="15" step="1" value="12">
-            <span class="ctrl-val" id="p1VolVal">12</span>
+            <input type="range" id="p1Vol" min="0" max="15" step="1" value="13">
+            <span class="ctrl-val" id="p1VolVal">13</span>
           </div>
           <div class="sep"></div>
           <div class="readout">
@@ -614,8 +614,8 @@ input[type=number]:focus { border-color: var(--accent); }
           </div>
           <div class="ctrl-row">
             <label>VOL</label>
-            <input type="range" id="p2Vol" min="0" max="15" step="1" value="9">
-            <span class="ctrl-val" id="p2VolVal">9</span>
+            <input type="range" id="p2Vol" min="0" max="15" step="1" value="10">
+            <span class="ctrl-val" id="p2VolVal">10</span>
           </div>
           <div class="ctrl-row">
             <label>SHIMMER</label>
@@ -751,15 +751,18 @@ const state = {
   swellDepth: 0.45, swellRate: 0.18,
   vibratoDepth: 0, vibratoRate: 5,
   triangle: { on: true, freq: 73.415 },
-  pulse1:   { on: true, freq: 146.83,  duty: 0.25, vol: 12, detuneCents: 0,  swaraName: 'Sa'  },
-  pulse2:   { on: true, freq: 220.245, duty: 0.25, vol: 9,  detuneCents: 7,  swaraName: 'Pa'  },
+  pulse1:   { on: true, freq: 146.83,  duty: 0.25, vol: 13, detuneCents: 0,  swaraName: 'Sa'  },
+  pulse2:   { on: true, freq: 220.245, duty: 0.25, vol: 10, detuneCents: 7,  swaraName: 'Pa'  },
 };
 
 // ── Audio ──────────────────────────────────────────────────
 let audioCtx = null, workletNode = null, analyser = null;
 
 async function startAudio() {
-  if (audioCtx) return;
+  if (audioCtx) {
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    return;
+  }
   audioCtx = new AudioContext({ latencyHint: 'interactive' });
   await audioCtx.audioWorklet.addModule('nes-worklet.js');
   workletNode = new AudioWorkletNode(audioCtx, 'nes-processor', {
@@ -770,6 +773,7 @@ async function startAudio() {
   analyser.smoothingTimeConstant = 0.3;
   workletNode.connect(analyser);
   analyser.connect(audioCtx.destination);
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
   sendAll();
 }
 
@@ -828,7 +832,6 @@ function drawScope() {
       ctx2d.strokeStyle = pass === 0 ? 'rgba(0,255,102,0.4)' : '#00ff66';
       ctx2d.lineWidth   = pass === 0 ? 2.5 : 1.5;
       ctx2d.beginPath();
-      const step = Math.max(1, Math.floor(scopeBuf.length / W));
       for (let x = 0; x < W; x++) {
         const idx = Math.floor(x * scopeBuf.length / W);
         const y   = H / 2 - scopeBuf[idx] * H * 0.42;
@@ -857,6 +860,11 @@ function drawScope() {
 // CSS variable can't be read by canvas context — capture once
 const var_phosphor = getComputedStyle(document.documentElement).getPropertyValue('--phosphor').trim() || '#00ff66';
 drawScope();
+
+// Resume AudioContext if browser suspended it (tab switch, mobile policy, etc.)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+});
 
 // ── Linked: apply Sa to all channels ──────────────────────
 function applyLinked() {
@@ -999,13 +1007,15 @@ noteInputEl.addEventListener('change', () => {
   if (!hz) { noteErrEl.textContent = '? ' + noteInputEl.value; noteErrEl.style.display = ''; return; }
   setSa(hz);
 });
-baseSaEl.addEventListener('input', e => {
+baseSaEl.addEventListener('change', e => {
   const v = parseFloat(e.target.value);
   if (isNaN(v) || v <= 0) return;
+  noteErrEl.style.display = 'none';
   state.baseSa = v;
   noteInputEl.value = hzToNote(v);
   document.getElementById('kattaiBadge').textContent = hzToKattai(v);
   if (state.linked) applyLinked();
+  else updateReadouts();
 });
 
 // ── Triangle ───────────────────────────────────────────────
@@ -1115,6 +1125,13 @@ function applyPresetSwaraToGrid(gridId, name) {
 function applyPreset(id) {
   const pr = PRESETS[id];
   if (!pr) return;
+
+  // Presets always work in linked mode — enable it if needed
+  if (!state.linked) {
+    state.linked = true;
+    document.getElementById('linkedToggle').checked = true;
+    setLinkedMode(true);
+  }
 
   // Set swaras (match by name string — no float comparison)
   state.pulse1.swaraName = pr.p1;

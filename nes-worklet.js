@@ -42,9 +42,11 @@ class NESProcessor extends AudioWorkletProcessor {
     this._sr      = sr;
     this._lpAlpha = 1 - Math.exp(-6.2832 * 14000 / sr); // 14 kHz LP, precomputed
 
+    this.masterVolume = 0.8; // must init before first process() block
+
     // Channel state
-    this.pulse1   = { on: true, freq: 146.83,  duty: 0.25, vol: 12, phase: 0, detuneCents: 0 };
-    this.pulse2   = { on: true, freq: 220.245, duty: 0.25, vol: 9,  phase: 0, detuneCents: 7 };
+    this.pulse1   = { on: true, freq: 146.83,  duty: 0.25, vol: 13, phase: 0, detuneCents: 0 };
+    this.pulse2   = { on: true, freq: 220.245, duty: 0.25, vol: 10, phase: 0, detuneCents: 7 };
     this.triangle = { on: true, freq: 73.415,  phase: 0 };
 
     // Global vibrato
