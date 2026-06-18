@@ -240,6 +240,39 @@
       </div>
     </div>
     <p class="hint">∿ Smoothed LFO — real NES vibrato steps at 60 Hz frame rate.</p>
+
+    <div class="sep"></div>
+    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;">Drone Movement</div>
+
+    <div class="field">
+      <label>Pitch Drift depth (¢)</label>
+      <div class="vol-row" style="margin-bottom:0">
+        <input type="range" id="driftDepth" min="0" max="30" step="0.5" value="8">
+        <span class="vol-val" id="driftDepthVal">8</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Drift speed (slow ↔ fast)</label>
+      <div class="vol-row" style="margin-bottom:0">
+        <input type="range" id="driftRate" min="0.04" max="0.5" step="0.01" value="0.13">
+        <span class="vol-val" id="driftRateVal">0.13</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Volume Swell depth (%)</label>
+      <div class="vol-row" style="margin-bottom:0">
+        <input type="range" id="swellDepth" min="0" max="1" step="0.01" value="0.45">
+        <span class="vol-val" id="swellDepthVal">45%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Swell speed (slow ↔ fast)</label>
+      <div class="vol-row" style="margin-bottom:0">
+        <input type="range" id="swellRate" min="0.05" max="0.5" step="0.01" value="0.18">
+        <span class="vol-val" id="swellRateVal">0.18</span>
+      </div>
+    </div>
+    <p class="hint">Channels are staggered ⅓ cycle apart — pitch and volume breathe independently, like tanpura strings. Pulse vol steps through 4-bit NES levels.</p>
   </div>
 
   <!-- TRIANGLE -->
@@ -411,11 +444,11 @@ async function startAudio() {
   sendParams();
 }
 
-function sendParams() {
+function sendParams(override) {
   if (!workletNode) return;
   workletNode.port.postMessage({
     type: 'params',
-    params: {
+    params: override || {
       masterVolume: state.masterVolume,
       vibratoDepth: state.vibratoDepth,
       vibratoRate:  state.vibratoRate,
@@ -552,6 +585,28 @@ mvEl.addEventListener('input', () => {
   state.masterVolume = parseFloat(mvEl.value);
   document.getElementById('masterVolVal').textContent = state.masterVolume.toFixed(2);
   sendParams();
+});
+
+// Drone movement
+document.getElementById('driftDepth').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  document.getElementById('driftDepthVal').textContent = v.toFixed(1);
+  sendParams({ drift: { depth: v } });
+});
+document.getElementById('driftRate').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  document.getElementById('driftRateVal').textContent = v.toFixed(2);
+  sendParams({ drift: { rate: v } });
+});
+document.getElementById('swellDepth').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  document.getElementById('swellDepthVal').textContent = Math.round(v * 100) + '%';
+  sendParams({ swell: { depth: v } });
+});
+document.getElementById('swellRate').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  document.getElementById('swellRateVal').textContent = v.toFixed(2);
+  sendParams({ swell: { rate: v } });
 });
 
 // Vibrato

@@ -1,9 +1,6 @@
 // NES NTSC 2A03 AudioWorklet Processor
-// CPU clock = 1789773 Hz (NTSC)
-
 const CPU = 1789773;
 
-// 32-step triangle waveform: 15,14,...,1,0,0,1,...,14,15
 const TRIANGLE_STEPS = (() => {
   const s = [];
   for (let i = 15; i >= 0; i--) s.push(i);
@@ -11,161 +8,203 @@ const TRIANGLE_STEPS = (() => {
   return s;
 })();
 
-function freqToPulsePeriod(f) {
-  return Math.round(CPU / (16 * f) - 1);
-}
-function freqToTriPeriod(f) {
-  return Math.round(CPU / (32 * f) - 1);
-}
-function pulseActualFreq(t) {
-  return CPU / (16 * (t + 1));
-}
-function triActualFreq(t) {
-  return CPU / (32 * (t + 1));
-}
-function cents(actual, target) {
-  return 1200 * Math.log2(actual / target);
+function freqToPulsePeriod(f) { return Math.round(CPU / (16 * f) - 1); }
+function freqToTriPeriod(f)   { return Math.round(CPU / (32 * f) - 1); }
+function pulseActualFreq(t)   { return CPU / (16 * (t + 1)); }
+function triActualFreq(t)     { return CPU / (32 * (t + 1)); }
+
+// Two-sine drift LFO: combines a primary and a slow secondary so the
+// pitch contour never feels metronomic.
+function driftMult(depth, phase, phase2) {
+  if (depth === 0) return 1;
+  const cents = depth * (0.65 * Math.sin(2 * Math.PI * phase) +
+                         0.35 * Math.sin(2 * Math.PI * phase2));
+  return Math.pow(2, cents / 1200);
 }
 
 class NESProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
-
     this._sr = sampleRate;
 
-    // Channel state
-    this.pulse1 = { on: true, freq: 146.83, duty: 0.5, vol: 10, phase: 0, detuneCents: 0 };
-    this.pulse2 = { on: true, freq: 220.245, duty: 0.25, vol: 8, phase: 0, detuneCents: 0 };
+    this.pulse1   = { on: true, freq: 146.83, duty: 0.25, vol: 12, phase: 0, detuneCents: 0 };
+    this.pulse2   = { on: true, freq: 220.245, duty: 0.25, vol: 9,  phase: 0, detuneCents: 7 };
     this.triangle = { on: true, freq: 73.415, phase: 0 };
 
-    // Vibrato
-    this.vibratoDepth = 0;   // cents
-    this.vibratoRate = 5;    // Hz
+    // Global vibrato
+    this.vibratoDepth = 0;
+    this.vibratoRate  = 5;
     this.vibratoPhase = 0;
 
-    // Master volume
-    this.masterVolume = 0.8;
+    // Per-channel slow drift (pitch wander, tanpura-like)
+    // Each channel has its own phase + a slower secondary phase, staggered.
+    // Offsets in [0,1) so they breathe at different points in the cycle.
+    this.drift = {
+      depth: 8,    // cents peak
+      rate:  0.13, // Hz primary
+      rate2: 0.07, // Hz secondary (creates aperiodic feel)
+      // per-channel phases — staggered by 1/3 cycle
+      tri:  { ph: 0,      ph2: 0      },
+      p1:   { ph: 0.333,  ph2: 0.2   },
+      p2:   { ph: 0.667,  ph2: 0.55  },
+    };
 
-    // DC-block state
+    // Per-channel amplitude swell (pulse channels only, steps through 4-bit vol)
+    // Triangle has no volume control so swell is pitch-only for it.
+    this.swell = {
+      depth: 0.45, // fraction of vol range to dip (0=none, 1=silence→full)
+      rate:  0.18, // Hz primary
+      rate2: 0.09, // Hz secondary
+      tri:  { ph: 0,      ph2: 0.1   },
+      p1:   { ph: 0.25,   ph2: 0.6   },
+      p2:   { ph: 0.6,    ph2: 0.85  },
+    };
+
+    this.masterVolume = 0.8;
     this._dcX1 = 0; this._dcY1 = 0;
-    // LP state
-    this._lpY = 0;
+    this._lpY  = 0;
+
+    // lpAlpha is constant per sample rate — precompute
+    this._lpAlpha = 1 - Math.exp(-2 * Math.PI * 14000 / this._sr);
 
     this.port.onmessage = (e) => this._handleMessage(e.data);
   }
 
   _handleMessage(data) {
-    if (data.type === 'params') {
-      const p = data.params;
-      if (p.masterVolume !== undefined) this.masterVolume = p.masterVolume;
-      if (p.vibratoDepth !== undefined) this.vibratoDepth = p.vibratoDepth;
-      if (p.vibratoRate !== undefined) this.vibratoRate = p.vibratoRate;
+    if (data.type !== 'params') return;
+    const p = data.params;
 
-      if (p.pulse1) {
-        const ch = this.pulse1;
-        if (p.pulse1.on !== undefined) ch.on = p.pulse1.on;
-        if (p.pulse1.freq !== undefined) ch.freq = p.pulse1.freq;
-        if (p.pulse1.duty !== undefined) ch.duty = p.pulse1.duty;
-        if (p.pulse1.vol !== undefined) ch.vol = p.pulse1.vol;
-        if (p.pulse1.detuneCents !== undefined) ch.detuneCents = p.pulse1.detuneCents;
-      }
-      if (p.pulse2) {
-        const ch = this.pulse2;
-        if (p.pulse2.on !== undefined) ch.on = p.pulse2.on;
-        if (p.pulse2.freq !== undefined) ch.freq = p.pulse2.freq;
-        if (p.pulse2.duty !== undefined) ch.duty = p.pulse2.duty;
-        if (p.pulse2.vol !== undefined) ch.vol = p.pulse2.vol;
-        if (p.pulse2.detuneCents !== undefined) ch.detuneCents = p.pulse2.detuneCents;
-      }
-      if (p.triangle) {
-        const ch = this.triangle;
-        if (p.triangle.on !== undefined) ch.on = p.triangle.on;
-        if (p.triangle.freq !== undefined) ch.freq = p.triangle.freq;
-      }
+    if (p.masterVolume !== undefined) this.masterVolume = p.masterVolume;
+    if (p.vibratoDepth !== undefined) this.vibratoDepth = p.vibratoDepth;
+    if (p.vibratoRate  !== undefined) this.vibratoRate  = p.vibratoRate;
+
+    if (p.drift) {
+      if (p.drift.depth !== undefined) this.drift.depth = p.drift.depth;
+      if (p.drift.rate  !== undefined) this.drift.rate  = p.drift.rate;
+      // secondary always at ~55% of primary for organic feel
+      this.drift.rate2 = this.drift.rate * 0.55;
     }
+    if (p.swell) {
+      if (p.swell.depth !== undefined) this.swell.depth = p.swell.depth;
+      if (p.swell.rate  !== undefined) this.swell.rate  = p.swell.rate;
+      this.swell.rate2 = this.swell.rate * 0.5;
+    }
+
+    const ch = (src, dst) => {
+      if (!src) return;
+      if (src.on    !== undefined) dst.on    = src.on;
+      if (src.freq  !== undefined) dst.freq  = src.freq;
+      if (src.duty  !== undefined) dst.duty  = src.duty;
+      if (src.vol   !== undefined) dst.vol   = src.vol;
+      if (src.detuneCents !== undefined) dst.detuneCents = src.detuneCents;
+    };
+    ch(p.pulse1,   this.pulse1);
+    ch(p.pulse2,   this.pulse2);
+    ch(p.triangle, this.triangle);
   }
 
   process(inputs, outputs) {
     const out = outputs[0][0];
     if (!out) return true;
-    const n = out.length;
+    const n  = out.length;
     const sr = this._sr;
 
+    const dr = this.drift;
+    const sw = this.swell;
+
     for (let i = 0; i < n; i++) {
-      // Vibrato LFO
-      const vibratoMult = this.vibratoDepth > 0
+      // ── Advance all slow LFO phases ──────────────────────
+      dr.tri.ph  = (dr.tri.ph  + dr.rate  / sr) % 1;
+      dr.tri.ph2 = (dr.tri.ph2 + dr.rate2 / sr) % 1;
+      dr.p1.ph   = (dr.p1.ph   + dr.rate  / sr) % 1;
+      dr.p1.ph2  = (dr.p1.ph2  + dr.rate2 / sr) % 1;
+      dr.p2.ph   = (dr.p2.ph   + dr.rate  / sr) % 1;
+      dr.p2.ph2  = (dr.p2.ph2  + dr.rate2 / sr) % 1;
+
+      sw.tri.ph  = (sw.tri.ph  + sw.rate  / sr) % 1;
+      sw.tri.ph2 = (sw.tri.ph2 + sw.rate2 / sr) % 1;
+      sw.p1.ph   = (sw.p1.ph   + sw.rate  / sr) % 1;
+      sw.p1.ph2  = (sw.p1.ph2  + sw.rate2 / sr) % 1;
+      sw.p2.ph   = (sw.p2.ph   + sw.rate  / sr) % 1;
+      sw.p2.ph2  = (sw.p2.ph2  + sw.rate2 / sr) % 1;
+
+      // ── Global vibrato ────────────────────────────────────
+      const vibMult = this.vibratoDepth > 0
         ? Math.pow(2, (this.vibratoDepth / 1200) * Math.sin(2 * Math.PI * this.vibratoPhase))
         : 1;
-      this.vibratoPhase += this.vibratoRate / sr;
-      if (this.vibratoPhase >= 1) this.vibratoPhase -= 1;
+      this.vibratoPhase = (this.vibratoPhase + this.vibratoRate / sr) % 1;
 
-      // --- Pulse 1 ---
-      let p1out = 0;
-      {
-        const ch = this.pulse1;
-        const detMult = Math.pow(2, ch.detuneCents / 1200);
-        const f = ch.freq * vibratoMult * detMult;
-        const t = Math.max(0, Math.min(2047, freqToPulsePeriod(f)));
-        const muted = !ch.on || t < 8;
-        if (!muted) {
-          const actualF = pulseActualFreq(t);
-          ch.phase += actualF / sr;
-          if (ch.phase >= 1) ch.phase -= 1;
-          p1out = (ch.phase < ch.duty) ? ch.vol : 0;
-        }
-      }
+      // ── Amplitude swell helper (returns 0–1 multiplier) ──
+      // Swell signal goes 0→1→0 slowly; depth controls how far it dips.
+      // s = 0.5 + 0.5*sin → range [0,1]; then scale by depth.
+      // effectiveMult = 1 - depth*(1 - s)  → at s=0 dips to (1-depth), at s=1 stays at 1
+      const swellMult = (ph, ph2) => {
+        if (sw.depth === 0) return 1;
+        const s = 0.5 + 0.5 * (0.65 * Math.sin(2 * Math.PI * ph) +
+                                0.35 * Math.sin(2 * Math.PI * ph2));
+        return 1 - sw.depth * (1 - Math.max(0, s));
+      };
 
-      // --- Pulse 2 ---
-      let p2out = 0;
-      {
-        const ch = this.pulse2;
-        const detMult = Math.pow(2, ch.detuneCents / 1200);
-        const f = ch.freq * vibratoMult * detMult;
-        const t = Math.max(0, Math.min(2047, freqToPulsePeriod(f)));
-        const muted = !ch.on || t < 8;
-        if (!muted) {
-          const actualF = pulseActualFreq(t);
-          ch.phase += actualF / sr;
-          if (ch.phase >= 1) ch.phase -= 1;
-          p2out = (ch.phase < ch.duty) ? ch.vol : 0;
-        }
-      }
-
-      // --- Triangle ---
+      // ── Triangle ──────────────────────────────────────────
       let triOut = 0;
       {
         const ch = this.triangle;
-        const f = ch.freq * vibratoMult;
-        const t = Math.max(0, Math.min(2047, freqToTriPeriod(f)));
-        const muted = !ch.on || t < 2;
-        if (!muted) {
+        const f  = ch.freq * vibMult * driftMult(dr.depth, dr.tri.ph, dr.tri.ph2);
+        const t  = Math.max(0, Math.min(2047, freqToTriPeriod(f)));
+        if (ch.on && t >= 2) {
           const actualF = triActualFreq(t);
-          ch.phase += actualF / sr;
-          if (ch.phase >= 1) ch.phase -= 1;
-          const step = Math.floor(ch.phase * 32);
-          triOut = TRIANGLE_STEPS[step];
+          ch.phase = (ch.phase + actualF / sr) % 1;
+          triOut = TRIANGLE_STEPS[Math.floor(ch.phase * 32)];
         }
       }
 
-      // --- NES nonlinear mixer ---
+      // ── Pulse 1 ───────────────────────────────────────────
+      let p1out = 0;
+      {
+        const ch   = this.pulse1;
+        const detM = Math.pow(2, ch.detuneCents / 1200);
+        const f    = ch.freq * vibMult * detM * driftMult(dr.depth, dr.p1.ph, dr.p1.ph2);
+        const t    = Math.max(0, Math.min(2047, freqToPulsePeriod(f)));
+        if (ch.on && t >= 8) {
+          const actualF = pulseActualFreq(t);
+          ch.phase = (ch.phase + actualF / sr) % 1;
+          // 4-bit volume stepped by swell
+          const vol = Math.max(0, Math.min(15, Math.round(ch.vol * swellMult(sw.p1.ph, sw.p1.ph2))));
+          p1out = (ch.phase < ch.duty) ? vol : 0;
+        }
+      }
+
+      // ── Pulse 2 ───────────────────────────────────────────
+      let p2out = 0;
+      {
+        const ch   = this.pulse2;
+        const detM = Math.pow(2, ch.detuneCents / 1200);
+        const f    = ch.freq * vibMult * detM * driftMult(dr.depth, dr.p2.ph, dr.p2.ph2);
+        const t    = Math.max(0, Math.min(2047, freqToPulsePeriod(f)));
+        if (ch.on && t >= 8) {
+          const actualF = pulseActualFreq(t);
+          ch.phase = (ch.phase + actualF / sr) % 1;
+          const vol = Math.max(0, Math.min(15, Math.round(ch.vol * swellMult(sw.p2.ph, sw.p2.ph2))));
+          p2out = (ch.phase < ch.duty) ? vol : 0;
+        }
+      }
+
+      // ── NES nonlinear mixer ───────────────────────────────
       const psum = p1out + p2out;
       const pulseLinear = psum > 0 ? 95.88 / ((8128 / psum) + 100) : 0;
-      const tndLinear = triOut > 0 ? 159.79 / ((1 / (triOut / 8227)) + 100) : 0;
+      const tndLinear   = triOut > 0 ? 159.79 / ((1 / (triOut / 8227)) + 100) : 0;
       let sample = (pulseLinear + tndLinear) * this.masterVolume;
 
-      // --- DC block (high-pass ~10 Hz) ---
-      const dcCoeff = 0.999;
-      const dcY = sample - this._dcX1 + dcCoeff * this._dcY1;
+      // ── DC block ──────────────────────────────────────────
+      const dcY = sample - this._dcX1 + 0.999 * this._dcY1;
       this._dcX1 = sample;
       this._dcY1 = dcY;
       sample = dcY;
 
-      // --- Low-pass ~14 kHz (one-pole IIR) ---
-      const lpAlpha = 1 - Math.exp(-2 * Math.PI * 14000 / sr);
-      this._lpY += lpAlpha * (sample - this._lpY);
-      sample = this._lpY;
+      // ── Low-pass ~14 kHz ──────────────────────────────────
+      this._lpY += this._lpAlpha * (sample - this._lpY);
 
-      out[i] = sample;
+      out[i] = this._lpY;
     }
     return true;
   }
