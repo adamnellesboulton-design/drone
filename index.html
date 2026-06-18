@@ -20,9 +20,7 @@
     --green: #44ff88;
     --font: 'Courier New', monospace;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     background: var(--bg);
     color: var(--text);
@@ -31,24 +29,25 @@
     min-height: 100vh;
     padding: 16px;
   }
+  h1 { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2); margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 11px; margin-bottom: 18px; letter-spacing: 1px; }
 
-  h1 {
-    font-size: 18px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--accent2);
-    margin-bottom: 4px;
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
   }
-  .subtitle {
-    color: var(--muted);
-    font-size: 11px;
-    margin-bottom: 18px;
-    letter-spacing: 1px;
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .main-grid {
     display: grid;
-    grid-template-columns: 220px 1fr 1fr 1fr;
+    grid-template-columns: 260px 1fr 1fr 1fr;
     gap: 12px;
     align-items: start;
   }
@@ -59,184 +58,107 @@
     border-radius: 4px;
     padding: 14px;
   }
-
   .panel-title {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
   }
-  .panel-title.p1 { color: var(--pulse1); border-color: var(--pulse1); }
-  .panel-title.p2 { color: var(--pulse2); border-color: var(--pulse2); }
-  .panel-title.tri { color: var(--tri); border-color: var(--tri); }
-  .panel-title.ctrl { color: var(--accent2); border-color: var(--accent2); }
+  .panel-title.p1  { color: var(--pulse1); border-color: var(--pulse1); }
+  .panel-title.p2  { color: var(--pulse2); border-color: var(--pulse2); }
+  .panel-title.tri { color: var(--tri);    border-color: var(--tri); }
+  .panel-title.ctrl{ color: var(--accent2);border-color: var(--accent2); }
 
-  .field {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-  }
-  .field label {
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
+  .field { display: flex; flex-direction: column; margin-bottom: 10px; }
+  .field label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
 
   input[type=number], input[type=range], select {
-    background: #1a1a33;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 13px;
-    padding: 4px 6px;
-    border-radius: 2px;
-    width: 100%;
-    outline: none;
+    background: #1a1a33; border: 1px solid var(--border);
+    color: var(--text); font-family: var(--font); font-size: 13px;
+    padding: 4px 6px; border-radius: 2px; width: 100%; outline: none;
   }
-  input[type=number]:focus, select:focus {
-    border-color: var(--accent);
-  }
-  input[type=range] {
-    padding: 0;
-    height: 20px;
-    cursor: pointer;
-    accent-color: var(--accent);
-  }
+  input[type=number]:focus, select:focus { border-color: var(--accent); }
+  input[type=range] { padding: 0; height: 20px; cursor: pointer; accent-color: var(--accent); }
 
-  .row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .row label {
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .row label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
 
-  .toggle {
-    position: relative;
-    display: inline-block;
-    width: 36px;
-    height: 20px;
-    flex-shrink: 0;
-  }
+  .toggle { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
   .toggle input { display: none; }
   .toggle-slider {
-    position: absolute;
-    inset: 0;
-    background: #222240;
-    border-radius: 2px;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    transition: background 0.15s;
+    position: absolute; inset: 0; background: #222240;
+    border-radius: 2px; cursor: pointer; border: 1px solid var(--border); transition: background 0.15s;
   }
   .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
   .toggle-slider::after {
-    content: '';
-    position: absolute;
-    width: 14px;
-    height: 12px;
-    left: 2px;
-    top: 3px;
-    background: #fff;
-    border-radius: 1px;
-    transition: transform 0.15s;
+    content: ''; position: absolute; width: 14px; height: 12px;
+    left: 2px; top: 3px; background: #fff; border-radius: 1px; transition: transform 0.15s;
   }
   .toggle input:checked + .toggle-slider::after { transform: translateX(16px); }
 
   .readout {
-    background: #0a0a18;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 8px;
-    font-size: 11px;
-    line-height: 1.7;
+    background: #0a0a18; border: 1px solid var(--border);
+    border-radius: 2px; padding: 8px; font-size: 11px; line-height: 1.8;
   }
-  .readout-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-  }
+  .readout-row { display: flex; justify-content: space-between; gap: 8px; }
   .readout-label { color: var(--muted); }
   .readout-val { color: var(--accent2); text-align: right; }
   .readout-val.warn { color: var(--warn); }
-  .readout-val.ok { color: var(--green); }
+  .readout-val.ok   { color: var(--green); }
 
   .btn {
-    background: #1a1a33;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 8px 12px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    width: 100%;
-    margin-bottom: 8px;
+    background: #1a1a33; border: 1px solid var(--border); color: var(--text);
+    font-family: var(--font); font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 8px 12px; border-radius: 2px; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s; width: 100%; margin-bottom: 8px;
   }
   .btn:hover { background: #22224a; border-color: var(--accent); }
   .btn.start { border-color: var(--green); color: var(--green); font-size: 14px; letter-spacing: 2px; }
-  .btn.stop  { border-color: var(--warn); color: var(--warn); font-size: 14px; letter-spacing: 2px; }
-  .btn.sa-pa { border-color: var(--accent2); color: var(--accent2); }
+  .btn.stop  { border-color: var(--warn);  color: var(--warn);  font-size: 14px; letter-spacing: 2px; }
 
   .status-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--muted);
-    margin-right: 6px;
-    transition: background 0.2s;
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted); margin-right: 6px; transition: background 0.2s;
   }
   .status-dot.running { background: var(--green); box-shadow: 0 0 6px var(--green); }
 
-  .vol-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
+  .vol-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
   .vol-row label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; min-width: 70px; }
-  .vol-val { font-size: 12px; color: var(--accent2); min-width: 28px; text-align: right; }
+  .vol-val { font-size: 12px; color: var(--accent2); min-width: 32px; text-align: right; }
 
-  .duty-btns {
-    display: flex;
-    gap: 4px;
-  }
+  .duty-btns { display: flex; gap: 4px; }
   .duty-btn {
-    flex: 1;
-    background: #1a1a33;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: var(--font);
-    font-size: 11px;
-    padding: 5px 2px;
-    border-radius: 2px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
+    flex: 1; background: #1a1a33; border: 1px solid var(--border); color: var(--muted);
+    font-family: var(--font); font-size: 11px; padding: 5px 2px; border-radius: 2px;
+    cursor: pointer; text-align: center; transition: all 0.15s;
   }
   .duty-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
   .sep { height: 1px; background: var(--border); margin: 10px 0; }
 
-  @media (max-width: 900px) {
-    .main-grid { grid-template-columns: 1fr 1fr; }
+  .linked-badge {
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 2px; border: 1px solid;
   }
-  @media (max-width: 560px) {
-    .main-grid { grid-template-columns: 1fr; }
+  .linked-badge.on  { color: var(--accent2); border-color: var(--accent2); }
+  .linked-badge.off { color: var(--muted);   border-color: var(--muted); }
+
+  .freq-readout {
+    font-size: 14px; color: var(--accent2); letter-spacing: 1px;
+    padding: 6px 0 4px; font-weight: bold;
   }
+  .freq-note { font-size: 10px; color: var(--muted); }
+
+  .swara-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+  .swara-btn {
+    flex: 1; min-width: 60px; background: #1a1a33; border: 1px solid var(--border); color: var(--muted);
+    font-family: var(--font); font-size: 11px; padding: 6px 4px; border-radius: 2px;
+    cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.4;
+  }
+  .swara-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .hint { font-size: 10px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+
+  @media (max-width: 980px)  { .main-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px)  { .main-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -250,13 +172,12 @@
   <div class="panel">
     <div class="panel-title ctrl">Master Control</div>
 
-    <div style="text-align:center;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
       <span class="status-dot" id="statusDot"></span>
       <span id="statusText" style="font-size:11px;color:var(--muted);">STOPPED</span>
     </div>
-
     <button class="btn start" id="startBtn">▶ START</button>
-    <button class="btn stop" id="stopBtn" style="display:none">■ STOP</button>
+    <button class="btn stop"  id="stopBtn" style="display:none">■ STOP</button>
 
     <div class="sep"></div>
 
@@ -268,11 +189,39 @@
 
     <div class="sep"></div>
 
-    <div class="field">
-      <label>Base Sa (Hz)</label>
-      <input type="number" id="baseSa" value="146.83" step="0.01" min="27.3" max="2000">
+    <!-- LINKED MODE -->
+    <div class="row" style="justify-content:space-between">
+      <span style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Linked Mode</span>
+      <label class="toggle">
+        <input type="checkbox" id="linkedToggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
     </div>
-    <button class="btn sa-pa" id="setSaPaBtn">Set Sa–Pa Drone</button>
+    <p class="hint" id="linkedHint">Channels move together from Base Sa. Unlink for free control.</p>
+
+    <div id="linkedControls">
+      <div class="sep"></div>
+      <div class="field">
+        <label>Base Sa — Note name (e.g. D3, C#3)</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="text" id="noteInput" value="D3" style="width:70px;flex-shrink:0;background:#1a1a33;border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:4px 6px;border-radius:2px;outline:none" placeholder="D3">
+          <span style="font-size:10px;color:var(--muted)">or Hz→</span>
+          <input type="number" id="baseSa" value="146.83" step="0.01" min="27.3" max="2000" style="flex:1">
+        </div>
+        <span id="noteError" style="font-size:10px;color:var(--warn);margin-top:2px;display:none">Unknown note</span>
+      </div>
+
+      <div class="field" style="margin-bottom:6px">
+        <label>Upper drone swara</label>
+        <div class="swara-btns" id="swaraBtns">
+          <button class="swara-btn active" data-ratio="1.5" data-name="Pa">Pa<br><span style="font-size:9px;color:var(--muted)">3:2</span></button>
+          <button class="swara-btn" data-ratio="1.3333" data-name="Ma">Ma<br><span style="font-size:9px;color:var(--muted)">4:3</span></button>
+          <button class="swara-btn" data-ratio="1.25" data-name="Ga">Ga<br><span style="font-size:9px;color:var(--muted)">5:4</span></button>
+          <button class="swara-btn" data-ratio="2.0" data-name="Sa↑">Sa↑<br><span style="font-size:9px;color:var(--muted)">2:1</span></button>
+        </div>
+      </div>
+      <p class="hint">Triangle=Sa/2 · Pulse 1=Sa · Pulse 2=Swara</p>
+    </div>
 
     <div class="sep"></div>
 
@@ -290,109 +239,104 @@
         <span class="vol-val" id="vibRateVal">5.0</span>
       </div>
     </div>
-    <p style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:4px;">
-      ∿ Smoothed LFO approximation — real NES vibrato steps at 60 Hz frame rate.
-    </p>
+    <p class="hint">∿ Smoothed LFO — real NES vibrato steps at 60 Hz frame rate.</p>
   </div>
 
   <!-- TRIANGLE -->
   <div class="panel">
-    <div class="panel-title tri">Triangle Channel</div>
+    <div class="panel-title tri">Triangle — Sa/2</div>
 
     <div class="row">
       <label>On</label>
-      <label class="toggle">
-        <input type="checkbox" id="triOn" checked>
-        <span class="toggle-slider"></span>
-      </label>
+      <label class="toggle"><input type="checkbox" id="triOn" checked><span class="toggle-slider"></span></label>
     </div>
 
-    <div class="field">
+    <div id="triFreqField" class="field" style="display:none">
       <label>Target Freq (Hz)</label>
       <input type="number" id="triFreq" value="73.415" step="0.001" min="0.01" max="10000">
     </div>
+    <div id="triFreqReadout">
+      <div class="freq-note">Target</div>
+      <div class="freq-readout" id="triFreqDisplay">73.415 Hz</div>
+      <div class="freq-note" id="triRoleLabel">Sa / 2 · Octave bass</div>
+    </div>
 
     <div class="sep"></div>
-
-    <div class="readout" id="triReadout">
+    <div class="readout">
       <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="triPeriod">—</span></div>
       <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="triActual">—</span></div>
       <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="triCents">—</span></div>
       <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="triMuted">—</span></div>
     </div>
-
     <div class="sep"></div>
-    <p style="font-size:10px;color:var(--muted);line-height:1.5;">
-      32-step 4-bit waveform · No volume control · Muted when t &lt; 2.
-      Lowest: ~27.3 Hz (t=2047).
-    </p>
+    <p class="hint">32-step 4-bit waveform · No volume control · Muted t&lt;2 · Lowest ≈27.3 Hz</p>
   </div>
 
   <!-- PULSE 1 -->
   <div class="panel">
-    <div class="panel-title p1">Pulse 1</div>
+    <div class="panel-title p1">Pulse 1 — Sa</div>
 
     <div class="row">
       <label>On</label>
-      <label class="toggle">
-        <input type="checkbox" id="p1On" checked>
-        <span class="toggle-slider"></span>
-      </label>
+      <label class="toggle"><input type="checkbox" id="p1On" checked><span class="toggle-slider"></span></label>
     </div>
 
-    <div class="field">
+    <div id="p1FreqField" class="field" style="display:none">
       <label>Target Freq (Hz)</label>
       <input type="number" id="p1Freq" value="146.83" step="0.001" min="0.01" max="10000">
     </div>
+    <div id="p1FreqReadout">
+      <div class="freq-note">Target</div>
+      <div class="freq-readout" id="p1FreqDisplay">146.830 Hz</div>
+      <div class="freq-note" id="p1RoleLabel">Sa · Root</div>
+    </div>
 
+    <div class="sep"></div>
     <div class="field">
       <label>Duty Cycle</label>
       <div class="duty-btns" id="p1DutyBtns">
         <button class="duty-btn" data-duty="0.125">12.5%</button>
-        <button class="duty-btn" data-duty="0.25">25%</button>
-        <button class="duty-btn active" data-duty="0.5">50%</button>
+        <button class="duty-btn active" data-duty="0.25">25%</button>
+        <button class="duty-btn" data-duty="0.5">50%</button>
       </div>
     </div>
-
     <div class="vol-row">
       <label>Volume (0–15)</label>
-      <input type="range" id="p1Vol" min="0" max="15" step="1" value="10">
-      <span class="vol-val" id="p1VolVal">10</span>
+      <input type="range" id="p1Vol" min="0" max="15" step="1" value="12">
+      <span class="vol-val" id="p1VolVal">12</span>
     </div>
 
     <div class="sep"></div>
-
     <div class="readout">
       <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="p1Period">—</span></div>
       <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="p1Actual">—</span></div>
       <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="p1Cents">—</span></div>
       <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="p1Muted">—</span></div>
     </div>
-
     <div class="sep"></div>
-    <p style="font-size:10px;color:var(--muted);line-height:1.5;">
-      11-bit timer · 4-bit volume · Muted when t &lt; 8.
-      Lowest: ~54.6 Hz (t=2047).
-    </p>
+    <p class="hint">11-bit timer · 4-bit volume · Muted t&lt;8 · Lowest ≈54.6 Hz</p>
   </div>
 
   <!-- PULSE 2 -->
   <div class="panel">
-    <div class="panel-title p2">Pulse 2</div>
+    <div class="panel-title p2">Pulse 2 — Swara</div>
 
     <div class="row">
       <label>On</label>
-      <label class="toggle">
-        <input type="checkbox" id="p2On" checked>
-        <span class="toggle-slider"></span>
-      </label>
+      <label class="toggle"><input type="checkbox" id="p2On" checked><span class="toggle-slider"></span></label>
     </div>
 
-    <div class="field">
+    <div id="p2FreqField" class="field" style="display:none">
       <label>Target Freq (Hz)</label>
       <input type="number" id="p2Freq" value="220.245" step="0.001" min="0.01" max="10000">
     </div>
+    <div id="p2FreqReadout">
+      <div class="freq-note">Target</div>
+      <div class="freq-readout" id="p2FreqDisplay">220.245 Hz</div>
+      <div class="freq-note" id="p2RoleLabel">Pa · Perfect fifth</div>
+    </div>
 
+    <div class="sep"></div>
     <div class="field">
       <label>Duty Cycle</label>
       <div class="duty-btns" id="p2DutyBtns">
@@ -401,69 +345,55 @@
         <button class="duty-btn" data-duty="0.5">50%</button>
       </div>
     </div>
-
     <div class="vol-row">
       <label>Volume (0–15)</label>
-      <input type="range" id="p2Vol" min="0" max="15" step="1" value="8">
-      <span class="vol-val" id="p2VolVal">8</span>
+      <input type="range" id="p2Vol" min="0" max="15" step="1" value="9">
+      <span class="vol-val" id="p2VolVal">9</span>
     </div>
-
-    <div class="field" style="margin-top:4px">
-      <label>Detune (cents ±25)</label>
+    <div class="field">
+      <label>Shimmer detune (±25 ¢)</label>
       <div class="vol-row" style="margin-bottom:0">
-        <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="0">
-        <span class="vol-val" id="p2DetuneVal">+0</span>
+        <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="7">
+        <span class="vol-val" id="p2DetuneVal">+7</span>
       </div>
     </div>
 
     <div class="sep"></div>
-
     <div class="readout">
       <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="p2Period">—</span></div>
       <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="p2Actual">—</span></div>
       <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="p2Cents">—</span></div>
       <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="p2Muted">—</span></div>
     </div>
-
     <div class="sep"></div>
-    <p style="font-size:10px;color:var(--muted);line-height:1.5;">
-      Detune shifts the target before period snap — creates beating shimmer.
-    </p>
+    <p class="hint">Detune shifts target before period snap — creates shimmer beating against Pulse 1.</p>
   </div>
 
 </div>
 
 <script>
-// ── Constants ──────────────────────────────────────────────
 const CPU = 1789773;
 
-function freqToPulsePeriod(f) {
-  return Math.round(CPU / (16 * f) - 1);
-}
-function freqToTriPeriod(f) {
-  return Math.round(CPU / (32 * f) - 1);
-}
-function pulseActualFreq(t) {
-  return CPU / (16 * (t + 1));
-}
-function triActualFreq(t) {
-  return CPU / (32 * (t + 1));
-}
-function cents(actual, target) {
-  return 1200 * Math.log2(actual / target);
-}
-function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-function detunedFreq(f, c) { return f * Math.pow(2, c / 1200); }
+function freqToPulsePeriod(f) { return Math.round(CPU / (16 * f) - 1); }
+function freqToTriPeriod(f)   { return Math.round(CPU / (32 * f) - 1); }
+function pulseActualFreq(t)   { return CPU / (16 * (t + 1)); }
+function triActualFreq(t)     { return CPU / (32 * (t + 1)); }
+function cents(actual, target){ return 1200 * Math.log2(actual / target); }
+function clamp(v, lo, hi)     { return Math.max(lo, Math.min(hi, v)); }
+function detunedFreq(f, c)    { return f * Math.pow(2, c / 1200); }
 
 // ── State ──────────────────────────────────────────────────
 const state = {
-  running: false,
+  linked: true,
+  baseSa: 146.83,
+  swaraRatio: 1.5,
+  swaraName: 'Pa',
   masterVolume: 0.8,
   vibratoDepth: 0,
   vibratoRate: 5,
   triangle: { on: true, freq: 73.415 },
-  pulse1: { on: true, freq: 146.83, duty: 0.5, vol: 10, detuneCents: 0 },
-  pulse2: { on: true, freq: 220.245, duty: 0.25, vol: 8, detuneCents: 0 },
+  pulse1:   { on: true, freq: 146.83, duty: 0.25, vol: 12, detuneCents: 0 },
+  pulse2:   { on: true, freq: 220.245, duty: 0.25, vol: 9, detuneCents: 7 },
 };
 
 // ── Audio ──────────────────────────────────────────────────
@@ -475,9 +405,7 @@ async function startAudio() {
   audioCtx = new AudioContext({ latencyHint: 'interactive' });
   await audioCtx.audioWorklet.addModule('nes-worklet.js');
   workletNode = new AudioWorkletNode(audioCtx, 'nes-processor', {
-    numberOfInputs: 0,
-    numberOfOutputs: 1,
-    outputChannelCount: [1],
+    numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [1],
   });
   workletNode.connect(audioCtx.destination);
   sendParams();
@@ -490,17 +418,32 @@ function sendParams() {
     params: {
       masterVolume: state.masterVolume,
       vibratoDepth: state.vibratoDepth,
-      vibratoRate: state.vibratoRate,
-      pulse1: { ...state.pulse1 },
-      pulse2: { ...state.pulse2 },
-      triangle: { ...state.triangle },
+      vibratoRate:  state.vibratoRate,
+      pulse1:    { ...state.pulse1 },
+      pulse2:    { ...state.pulse2 },
+      triangle:  { ...state.triangle },
     }
   });
 }
 
 function stopAudio() {
   if (workletNode) { workletNode.disconnect(); workletNode = null; }
-  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  if (audioCtx)    { audioCtx.close(); audioCtx = null; }
+}
+
+// ── Linked: recompute all freqs from baseSa ────────────────
+function applyLinked() {
+  const sa = state.baseSa;
+  state.triangle.freq = sa / 2;
+  state.pulse1.freq   = sa;
+  state.pulse2.freq   = sa * state.swaraRatio;
+  // Update display fields (not the inputs — those are hidden in linked mode)
+  document.getElementById('triFreqDisplay').textContent = (sa / 2).toFixed(3) + ' Hz';
+  document.getElementById('p1FreqDisplay').textContent  = sa.toFixed(3) + ' Hz';
+  document.getElementById('p2FreqDisplay').textContent  = (sa * state.swaraRatio).toFixed(3) + ' Hz';
+  document.getElementById('p2RoleLabel').textContent    = state.swaraName + ' · ratio ' + state.swaraRatio.toFixed(4);
+  sendParams();
+  updateReadouts();
 }
 
 // ── Readout update ─────────────────────────────────────────
@@ -521,7 +464,6 @@ function updateReadouts() {
     mEl.textContent = muted ? (t < 2 ? 'MUTED (t<2)' : 'OFF') : 'ACTIVE';
     mEl.className = 'readout-val ' + (muted ? 'warn' : 'ok');
   }
-
   // Pulse 1
   {
     const f = detunedFreq(state.pulse1.freq, state.pulse1.detuneCents);
@@ -538,7 +480,6 @@ function updateReadouts() {
     mEl.textContent = muted ? (t < 8 ? 'MUTED (t<8)' : 'OFF') : 'ACTIVE';
     mEl.className = 'readout-val ' + (muted ? 'warn' : 'ok');
   }
-
   // Pulse 2
   {
     const f = detunedFreq(state.pulse2.freq, state.pulse2.detuneCents);
@@ -557,21 +498,27 @@ function updateReadouts() {
   }
 }
 
-// ── UI helpers ─────────────────────────────────────────────
-function setStatus(running) {
-  state.running = running;
-  document.getElementById('statusDot').className = 'status-dot' + (running ? ' running' : '');
-  document.getElementById('statusText').textContent = running ? 'RUNNING' : 'STOPPED';
-  document.getElementById('statusText').style.color = running ? 'var(--green)' : 'var(--muted)';
-  document.getElementById('startBtn').style.display = running ? 'none' : 'block';
-  document.getElementById('stopBtn').style.display = running ? 'block' : 'none';
+// ── Toggle linked / free mode ──────────────────────────────
+function setLinkedMode(on) {
+  state.linked = on;
+  // Show/hide freq inputs vs readout displays
+  ['tri','p1','p2'].forEach(ch => {
+    document.getElementById(ch + 'FreqField').style.display   = on ? 'none'  : 'flex';
+    document.getElementById(ch + 'FreqReadout').style.display = on ? 'block' : 'none';
+  });
+  document.getElementById('linkedControls').style.display = on ? 'block' : 'none';
+  document.getElementById('linkedHint').textContent = on
+    ? 'Channels move together from Base Sa. Unlink for free control.'
+    : 'Free mode — each channel is independent.';
+
+  if (on) applyLinked();
 }
 
+// ── Duty buttons ───────────────────────────────────────────
 function setupDutyButtons(containerId, channel) {
-  const container = document.getElementById(containerId);
-  container.querySelectorAll('.duty-btn').forEach(btn => {
+  document.getElementById(containerId).querySelectorAll('.duty-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      container.querySelectorAll('.duty-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(containerId).querySelectorAll('.duty-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       channel.duty = parseFloat(btn.dataset.duty);
       sendParams();
@@ -579,44 +526,63 @@ function setupDutyButtons(containerId, channel) {
   });
 }
 
-// ── Wire up controls ───────────────────────────────────────
+// ── Wire controls ──────────────────────────────────────────
 document.getElementById('startBtn').addEventListener('click', async () => {
   await startAudio();
-  setStatus(true);
+  document.getElementById('statusDot').className = 'status-dot running';
+  document.getElementById('statusText').textContent = 'RUNNING';
+  document.getElementById('statusText').style.color = 'var(--green)';
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('stopBtn').style.display  = 'block';
   updateReadouts();
 });
 
 document.getElementById('stopBtn').addEventListener('click', () => {
   stopAudio();
-  setStatus(false);
+  document.getElementById('statusDot').className = 'status-dot';
+  document.getElementById('statusText').textContent = 'STOPPED';
+  document.getElementById('statusText').style.color = 'var(--muted)';
+  document.getElementById('startBtn').style.display = 'block';
+  document.getElementById('stopBtn').style.display  = 'none';
 });
 
-// Master volume
-const masterVolEl = document.getElementById('masterVol');
-masterVolEl.addEventListener('input', () => {
-  state.masterVolume = parseFloat(masterVolEl.value);
+// Master vol
+const mvEl = document.getElementById('masterVol');
+mvEl.addEventListener('input', () => {
+  state.masterVolume = parseFloat(mvEl.value);
   document.getElementById('masterVolVal').textContent = state.masterVolume.toFixed(2);
   sendParams();
 });
 
 // Vibrato
-const vibDepthEl = document.getElementById('vibDepth');
-vibDepthEl.addEventListener('input', () => {
-  state.vibratoDepth = parseFloat(vibDepthEl.value);
+document.getElementById('vibDepth').addEventListener('input', e => {
+  state.vibratoDepth = parseFloat(e.target.value);
   document.getElementById('vibDepthVal').textContent = state.vibratoDepth.toFixed(1);
   sendParams();
 });
-const vibRateEl = document.getElementById('vibRate');
-vibRateEl.addEventListener('input', () => {
-  state.vibratoRate = parseFloat(vibRateEl.value);
+document.getElementById('vibRate').addEventListener('input', e => {
+  state.vibratoRate = parseFloat(e.target.value);
   document.getElementById('vibRateVal').textContent = state.vibratoRate.toFixed(1);
   sendParams();
 });
 
+// Linked toggle
+document.getElementById('linkedToggle').addEventListener('change', e => setLinkedMode(e.target.checked));
+
+// Swara buttons
+document.getElementById('swaraBtns').querySelectorAll('.swara-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('swaraBtns').querySelectorAll('.swara-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.swaraRatio = parseFloat(btn.dataset.ratio);
+    state.swaraName  = btn.dataset.name;
+    if (state.linked) applyLinked();
+  });
+});
+
 // Triangle
 document.getElementById('triOn').addEventListener('change', e => {
-  state.triangle.on = e.target.checked;
-  sendParams(); updateReadouts();
+  state.triangle.on = e.target.checked; sendParams(); updateReadouts();
 });
 document.getElementById('triFreq').addEventListener('input', e => {
   const v = parseFloat(e.target.value);
@@ -625,16 +591,14 @@ document.getElementById('triFreq').addEventListener('input', e => {
 
 // Pulse 1
 document.getElementById('p1On').addEventListener('change', e => {
-  state.pulse1.on = e.target.checked;
-  sendParams(); updateReadouts();
+  state.pulse1.on = e.target.checked; sendParams(); updateReadouts();
 });
 document.getElementById('p1Freq').addEventListener('input', e => {
   const v = parseFloat(e.target.value);
   if (!isNaN(v) && v > 0) { state.pulse1.freq = v; sendParams(); updateReadouts(); }
 });
-const p1VolEl = document.getElementById('p1Vol');
-p1VolEl.addEventListener('input', () => {
-  state.pulse1.vol = parseInt(p1VolEl.value);
+document.getElementById('p1Vol').addEventListener('input', e => {
+  state.pulse1.vol = parseInt(e.target.value);
   document.getElementById('p1VolVal').textContent = state.pulse1.vol;
   sendParams();
 });
@@ -642,51 +606,75 @@ setupDutyButtons('p1DutyBtns', state.pulse1);
 
 // Pulse 2
 document.getElementById('p2On').addEventListener('change', e => {
-  state.pulse2.on = e.target.checked;
-  sendParams(); updateReadouts();
+  state.pulse2.on = e.target.checked; sendParams(); updateReadouts();
 });
 document.getElementById('p2Freq').addEventListener('input', e => {
   const v = parseFloat(e.target.value);
   if (!isNaN(v) && v > 0) { state.pulse2.freq = v; sendParams(); updateReadouts(); }
 });
-const p2VolEl = document.getElementById('p2Vol');
-p2VolEl.addEventListener('input', () => {
-  state.pulse2.vol = parseInt(p2VolEl.value);
+document.getElementById('p2Vol').addEventListener('input', e => {
+  state.pulse2.vol = parseInt(e.target.value);
   document.getElementById('p2VolVal').textContent = state.pulse2.vol;
   sendParams();
 });
-const p2DetuneEl = document.getElementById('p2Detune');
-p2DetuneEl.addEventListener('input', () => {
-  state.pulse2.detuneCents = parseFloat(p2DetuneEl.value);
+document.getElementById('p2Detune').addEventListener('input', e => {
+  state.pulse2.detuneCents = parseFloat(e.target.value);
   const v = state.pulse2.detuneCents;
   document.getElementById('p2DetuneVal').textContent = (v >= 0 ? '+' : '') + v.toFixed(1);
   sendParams(); updateReadouts();
 });
 setupDutyButtons('p2DutyBtns', state.pulse2);
 
-// Sa–Pa button
-document.getElementById('setSaPaBtn').addEventListener('click', () => {
-  const sa = parseFloat(document.getElementById('baseSa').value);
-  if (isNaN(sa) || sa <= 0) return;
+// ── Note name ↔ Hz ────────────────────────────────────────
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NOTE_ALIASES = { 'Db':'C#','Eb':'D#','Fb':'E','Gb':'F#','Ab':'G#','Bb':'A#','Cb':'B' };
 
-  // Triangle = Sa / 2 (octave down)
-  state.triangle.freq = sa / 2;
-  document.getElementById('triFreq').value = (sa / 2).toFixed(3);
+function noteToHz(str) {
+  str = str.trim().toUpperCase().replace(/\s/g,'');
+  // match e.g. D3, C#4, Bb2, F#3
+  const m = str.match(/^([A-G][#B]?)(-?\d+)$/);
+  if (!m) return null;
+  let name = m[1].replace('B','b'); // normalize flat symbol
+  name = NOTE_ALIASES[name] || name;
+  const semitone = NOTE_NAMES.indexOf(name);
+  if (semitone < 0) return null;
+  const octave = parseInt(m[2]);
+  const midi = 12 * (octave + 1) + semitone;
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
 
-  // Pulse 1 = Sa
-  state.pulse1.freq = sa;
-  document.getElementById('p1Freq').value = sa.toFixed(3);
+function hzToNote(hz) {
+  const midi = Math.round(69 + 12 * Math.log2(hz / 440));
+  const semitone = ((midi % 12) + 12) % 12;
+  const octave = Math.floor(midi / 12) - 1;
+  return NOTE_NAMES[semitone] + octave;
+}
 
-  // Pulse 2 = Sa * 1.5 (the fifth, Pa)
-  state.pulse2.freq = sa * 1.5;
-  document.getElementById('p2Freq').value = (sa * 1.5).toFixed(3);
+const noteInputEl = document.getElementById('noteInput');
+const baseSaEl    = document.getElementById('baseSa');
+const noteErrEl   = document.getElementById('noteError');
 
-  sendParams();
-  updateReadouts();
+noteInputEl.addEventListener('change', () => {
+  const hz = noteToHz(noteInputEl.value);
+  if (hz === null || hz < 10) { noteErrEl.style.display = 'inline'; return; }
+  noteErrEl.style.display = 'none';
+  baseSaEl.value = hz.toFixed(3);
+  state.baseSa = hz;
+  if (state.linked) applyLinked();
 });
 
-// ── Init readouts on page load ─────────────────────────────
-updateReadouts();
+baseSaEl.addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (!isNaN(v) && v > 0) {
+    state.baseSa = v;
+    noteInputEl.value = hzToNote(v);
+    noteErrEl.style.display = 'none';
+    if (state.linked) applyLinked();
+  }
+});
+
+// ── Init ───────────────────────────────────────────────────
+setLinkedMode(true);   // sets up displays, computes freqs, calls updateReadouts
 </script>
 </body>
 </html>
