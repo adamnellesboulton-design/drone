@@ -1,6 +1,6 @@
 {
   "name": "NES Drone",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
   "forwardPorts": [8080],
   "portsAttributes": {
     "8080": {
@@ -9,5 +9,5 @@
       "visibility": "public"
     }
   },
-  "postAttachCommand": "python3 -m http.server 8080 --bind 0.0.0.0"
+  "postAttachCommand": "npx --yes serve -l 8080 ."
 }
