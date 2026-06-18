@@ -3,531 +3,760 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NES Drone — 2A03 Tanpura</title>
+<title>NES DRONE — 2A03 Tanpura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0d0d1a;
-    --panel: #13132a;
-    --border: #2a2a5a;
-    --accent: #5555ff;
-    --accent2: #00ccaa;
-    --pulse1: #ff6644;
-    --pulse2: #ffaa22;
-    --tri: #44ddbb;
-    --text: #ccccee;
-    --muted: #555577;
-    --warn: #ff4444;
-    --green: #44ff88;
-    --font: 'Courier New', monospace;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: var(--font); font-size: 13px;
-    min-height: 100vh; padding: 16px;
-  }
-  h1 { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2); margin-bottom: 3px; }
-  .subtitle { color: var(--muted); font-size: 11px; margin-bottom: 16px; letter-spacing: 1px; }
+:root {
+  --bg:      #080810;
+  --panel:   #0e0e20;
+  --border:  #252550;
+  --accent:  #4444ff;
+  --teal:    #00ddaa;
+  --orange:  #ff6633;
+  --yellow:  #ffaa22;
+  --green:   #33ff77;
+  --red:     #ff3333;
+  --dim:     #444466;
+  --text:    #bbbbdd;
+  --phosphor:#00ff66;
+  --font:    'Courier New', monospace;
+  --pixel:   'Press Start 2P', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .main-grid {
-    display: grid;
-    grid-template-columns: 250px 1fr 1fr 1fr;
-    gap: 12px;
-    align-items: start;
-  }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12px;
+  min-height: 100vh;
+  padding: 12px 14px 24px;
+}
 
-  .panel {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 4px; padding: 14px;
-  }
-  .panel-title {
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: baseline;
-  }
-  .panel-title.p1  { color: var(--pulse1); border-color: var(--pulse1); }
-  .panel-title.p2  { color: var(--pulse2); border-color: var(--pulse2); }
-  .panel-title.tri { color: var(--tri);    border-color: var(--tri); }
-  .panel-title.ctrl{ color: var(--accent2);border-color: var(--accent2); }
-  .panel-title small { font-size: 9px; opacity: 0.6; letter-spacing: 1px; }
+/* ── Typography ──────────────────────────────────────────── */
+h1 {
+  font-family: var(--pixel);
+  font-size: 13px;
+  color: var(--phosphor);
+  letter-spacing: 2px;
+  text-shadow: 0 0 12px var(--phosphor);
+  margin-bottom: 2px;
+}
+.tagline { font-size: 9px; color: var(--dim); letter-spacing: 2px; margin-bottom: 10px; }
 
-  .field { display: flex; flex-direction: column; margin-bottom: 10px; }
-  .field label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+/* ── Oscilloscope ────────────────────────────────────────── */
+.scope-wrap {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  margin-bottom: 10px;
+  border: 1px solid #1a1a3a;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #020208;
+}
+#scope { width: 100%; height: 100%; display: block; }
+.scope-label {
+  position: absolute;
+  top: 4px; left: 6px;
+  font-size: 8px;
+  color: #003322;
+  letter-spacing: 2px;
+  pointer-events: none;
+}
+.scope-label.live { color: #00aa44; }
 
-  input[type=number], input[type=range], select, input[type=text] {
-    background: #1a1a33; border: 1px solid var(--border);
-    color: var(--text); font-family: var(--font); font-size: 13px;
-    padding: 4px 6px; border-radius: 2px; width: 100%; outline: none;
-  }
-  input[type=number]:focus, input[type=text]:focus, select:focus { border-color: var(--accent); }
-  input[type=range] { padding: 0; height: 20px; cursor: pointer; accent-color: var(--accent); }
+/* ── Transport bar ───────────────────────────────────────── */
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
 
-  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .row label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+.btn-start, .btn-stop {
+  font-family: var(--pixel);
+  font-size: 10px;
+  padding: 10px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  border: 2px solid;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  transition: all 0.1s;
+  min-width: 110px;
+  text-align: center;
+}
+.btn-start {
+  background: #001a08;
+  border-color: var(--green);
+  color: var(--green);
+  text-shadow: 0 0 8px var(--green);
+  box-shadow: 0 0 10px #0a3a1a;
+}
+.btn-start:hover { background: #003310; box-shadow: 0 0 18px #0f5520; }
+.btn-stop {
+  background: #1a0008;
+  border-color: var(--red);
+  color: var(--red);
+}
+.btn-stop:hover { background: #2a000e; }
 
-  .toggle { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
-  .toggle input { display: none; }
-  .toggle-slider {
-    position: absolute; inset: 0; background: #222240;
-    border-radius: 2px; cursor: pointer; border: 1px solid var(--border); transition: background 0.15s;
-  }
-  .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
-  .toggle-slider::after {
-    content: ''; position: absolute; width: 14px; height: 12px;
-    left: 2px; top: 3px; background: #fff; border-radius: 1px; transition: transform 0.15s;
-  }
-  .toggle input:checked + .toggle-slider::after { transform: translateX(16px); }
+.sa-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 260px;
+}
+.sa-group label { font-size: 9px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+.sa-note {
+  width: 56px;
+  font-family: var(--pixel);
+  font-size: 12px;
+  text-align: center;
+  background: #0a0a1a;
+  border: 1px solid var(--accent);
+  color: var(--teal);
+  padding: 6px 4px;
+  border-radius: 2px;
+  outline: none;
+}
+.sa-note:focus { box-shadow: 0 0 8px var(--accent); }
+.sa-hz {
+  width: 90px;
+  font-size: 12px;
+  background: #0a0a1a;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 6px;
+  border-radius: 2px;
+  outline: none;
+  font-family: var(--font);
+}
+.sa-hz:focus { border-color: var(--accent); }
+.kattai-badge {
+  font-size: 9px;
+  color: var(--dim);
+  border: 1px solid #252542;
+  padding: 3px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.note-err { font-size: 9px; color: var(--red); display: none; }
 
-  .readout {
-    background: #0a0a18; border: 1px solid var(--border);
-    border-radius: 2px; padding: 8px; font-size: 11px; line-height: 1.8;
-  }
-  .readout-row { display: flex; justify-content: space-between; gap: 8px; }
-  .readout-label { color: var(--muted); }
-  .readout-val { color: var(--accent2); text-align: right; font-variant-numeric: tabular-nums; }
-  .readout-val.warn { color: var(--warn); }
-  .readout-val.ok   { color: var(--green); }
+.vol-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 140px;
+}
+.vol-group label { font-size: 9px; color: var(--dim); letter-spacing: 2px; }
+.vol-group input  { flex: 1; accent-color: var(--teal); }
+.vol-group span   { font-size: 11px; color: var(--teal); min-width: 32px; text-align: right; }
 
-  .btn {
-    background: #1a1a33; border: 1px solid var(--border); color: var(--text);
-    font-family: var(--font); font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
-    padding: 8px 12px; border-radius: 2px; cursor: pointer;
-    transition: border-color 0.15s, background 0.15s; width: 100%; margin-bottom: 8px;
-  }
-  .btn:hover { background: #22224a; border-color: var(--accent); }
-  .btn.start { border-color: var(--green); color: var(--green); font-size: 14px; letter-spacing: 2px; }
-  .btn.stop  { border-color: var(--warn);  color: var(--warn);  font-size: 14px; letter-spacing: 2px; }
+.linked-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.linked-group label { font-size: 9px; color: var(--dim); letter-spacing: 2px; }
 
-  .status-dot {
-    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--muted); margin-right: 6px; transition: background 0.2s; flex-shrink: 0;
-  }
-  .status-dot.running { background: var(--green); box-shadow: 0 0 6px var(--green); }
+/* ── Toggle ──────────────────────────────────────────────── */
+.toggle { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
+.toggle input { display: none; }
+.toggle-slider {
+  position: absolute; inset: 0; background: #111122;
+  border-radius: 2px; cursor: pointer; border: 1px solid var(--border); transition: all 0.15s;
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.toggle-slider::after {
+  content: ''; position: absolute; width: 14px; height: 12px;
+  left: 2px; top: 3px; background: #fff; border-radius: 1px; transition: transform 0.15s;
+}
+.toggle input:checked + .toggle-slider::after { transform: translateX(18px); }
 
-  .vol-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-  .vol-row label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; min-width: 60px; }
-  .vol-val { font-size: 12px; color: var(--accent2); min-width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+/* ── Presets ─────────────────────────────────────────────── */
+.presets-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  align-items: center;
+}
+.presets-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; white-space: nowrap; margin-right: 4px; }
 
-  /* Swara pill buttons */
-  .swara-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-  .swara-btn {
-    background: #1a1a33; border: 1px solid var(--border); color: var(--muted);
-    font-family: var(--font); font-size: 12px; padding: 7px 3px; border-radius: 2px;
-    cursor: pointer; text-align: center; transition: all 0.12s; line-height: 1.3;
-  }
-  .swara-btn:hover { border-color: var(--accent); color: var(--text); }
-  .swara-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .swara-btn small { display: block; font-size: 9px; opacity: 0.7; }
+.preset-btn {
+  font-family: var(--font);
+  font-size: 11px;
+  background: #111122;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.1s;
+  line-height: 1.3;
+}
+.preset-btn:hover { border-color: var(--teal); color: var(--teal); background: #0a1a14; }
+.preset-btn b { display: block; font-size: 12px; margin-bottom: 1px; }
+.preset-btn span { font-size: 9px; color: var(--dim); }
 
-  .duty-btns { display: flex; gap: 4px; }
-  .duty-btn {
-    flex: 1; background: #1a1a33; border: 1px solid var(--border); color: var(--muted);
-    font-family: var(--font); font-size: 11px; padding: 5px 2px; border-radius: 2px;
-    cursor: pointer; text-align: center; transition: all 0.12s;
-  }
-  .duty-btn:hover { border-color: var(--accent); }
-  .duty-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+/* ── Channel grid ────────────────────────────────────────── */
+.channels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
 
-  .sep { height: 1px; background: var(--border); margin: 10px 0; }
+.channel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.channel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.ch-name {
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.ch-name.tri { color: var(--teal); }
+.ch-name.p1  { color: var(--orange); }
+.ch-name.p2  { color: var(--yellow); }
 
-  .freq-display {
-    background: #0a0a18; border: 1px solid var(--border); border-radius: 2px;
-    padding: 8px 10px; margin-bottom: 10px;
-  }
-  .freq-display .big { font-size: 15px; color: var(--accent2); letter-spacing: 1px; font-weight: bold; }
-  .freq-display .role { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.ch-role {
+  font-size: 9px;
+  color: var(--dim);
+  margin-left: auto;
+  margin-right: 8px;
+}
 
-  .hint { font-size: 10px; color: var(--muted); line-height: 1.55; }
+.channel-body { padding: 10px; }
 
-  .section-label {
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--accent2); margin: 12px 0 8px;
-  }
+/* Frequency display */
+.freq-box {
+  background: #060612;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.freq-big { font-size: 14px; color: var(--teal); letter-spacing: 1px; font-weight: bold; }
+.freq-sub { font-size: 9px; color: var(--dim); margin-top: 2px; }
 
-  /* Note entry row */
-  .note-row { display: flex; gap: 6px; align-items: stretch; }
-  .note-row input[type=text]   { width: 62px; flex-shrink: 0; font-size: 14px; text-align: center; }
-  .note-row .divider { font-size: 10px; color: var(--muted); align-self: center; white-space: nowrap; }
-  .note-row input[type=number] { flex: 1; }
+/* Swara grid */
+.swara-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.sw-btn {
+  background: #111122;
+  border: 1px solid var(--border);
+  color: var(--dim);
+  font-family: var(--font);
+  font-size: 11px;
+  padding: 6px 2px;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.1s;
+  line-height: 1.3;
+}
+.sw-btn small { display: block; font-size: 8px; }
+.sw-btn:hover { border-color: var(--accent); color: var(--text); }
+.sw-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 6px var(--accent); }
 
-  .kattai-badge {
-    display: inline-block; font-size: 10px; color: var(--muted);
-    border: 1px solid var(--border); border-radius: 2px; padding: 2px 6px;
-    margin-left: 6px; vertical-align: middle;
-  }
+/* Free-mode freq input */
+.free-freq {
+  width: 100%;
+  background: #0a0a1a;
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 2px;
+  outline: none;
+  margin-bottom: 8px;
+  display: none;
+}
+.free-freq:focus { box-shadow: 0 0 6px var(--accent); }
 
-  .preset-btn {
-    background: #1a1a33; border: 1px solid var(--border); color: var(--text);
-    font-family: var(--font); font-size: 12px; font-weight: bold;
-    padding: 8px 14px; border-radius: 2px; cursor: pointer; text-align: left;
-    line-height: 1.4; transition: all 0.12s;
-  }
-  .preset-btn:hover { background: #22224a; border-color: var(--accent2); color: var(--accent2); }
-  .preset-btn span  { display: block; font-size: 9px; color: var(--muted); font-weight: normal; margin-top: 2px; }
+/* Per-channel advanced controls inside <details> */
+details.ch-adv { margin-top: 8px; }
+details.ch-adv > summary {
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  cursor: pointer;
+  padding: 4px 0;
+  list-style: none;
+  user-select: none;
+}
+details.ch-adv > summary::before { content: '▶ '; }
+details.ch-adv[open] > summary::before { content: '▼ '; }
+details.ch-adv > summary:hover { color: var(--text); }
 
-  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px)  { .main-grid { grid-template-columns: 1fr; } }
+/* Duty buttons */
+.duty-row { display: flex; gap: 4px; margin-bottom: 8px; }
+.duty-btn {
+  flex: 1;
+  background: #111122;
+  border: 1px solid var(--border);
+  color: var(--dim);
+  font-family: var(--font);
+  font-size: 10px;
+  padding: 5px 2px;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.1s;
+}
+.duty-btn:hover { border-color: var(--accent); }
+.duty-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Sliders and labels */
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.ctrl-row label {
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  min-width: 50px;
+}
+.ctrl-row input[type=range] { flex: 1; accent-color: var(--accent); height: 16px; cursor: pointer; }
+.ctrl-val { font-size: 11px; color: var(--teal); min-width: 36px; text-align: right; }
+
+/* Readout */
+.readout {
+  background: #040410;
+  border: 1px solid #1a1a35;
+  border-radius: 2px;
+  padding: 6px 8px;
+  font-size: 10px;
+  line-height: 1.9;
+}
+.ro-row { display: flex; justify-content: space-between; gap: 6px; }
+.ro-lbl { color: var(--dim); }
+.ro-val { color: var(--teal); text-align: right; font-variant-numeric: tabular-nums; }
+.ro-val.ok   { color: var(--green); }
+.ro-val.warn { color: var(--red); }
+
+/* ── Movement & Vibrato panel ────────────────────────────── */
+details.mv-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0;
+  margin-bottom: 8px;
+}
+details.mv-panel > summary {
+  padding: 10px 12px;
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+details.mv-panel > summary::before { content: '▶'; font-size: 8px; }
+details.mv-panel[open] > summary::before { content: '▼'; }
+details.mv-panel > summary:hover { color: var(--text); }
+.mv-body {
+  padding: 10px 12px 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+  border-top: 1px solid var(--border);
+}
+.mv-section-label { font-size: 9px; color: var(--teal); letter-spacing: 2px; margin-bottom: 6px; }
+.hint-text { font-size: 9px; color: var(--dim); line-height: 1.6; margin-top: 4px; }
+
+/* ── Misc ────────────────────────────────────────────────── */
+input[type=number] {
+  background: #0a0a1a; border: 1px solid var(--border);
+  color: var(--text); font-family: var(--font); font-size: 12px;
+  padding: 4px 6px; border-radius: 2px; outline: none;
+}
+input[type=number]:focus { border-color: var(--accent); }
+
+.sep { height: 1px; background: var(--border); margin: 8px 0; }
+
+@media (max-width: 720px) {
+  .channels { grid-template-columns: 1fr; }
+  .mv-body  { grid-template-columns: 1fr; }
+  .sa-group { min-width: 100%; }
+}
 </style>
 </head>
 <body>
 
-<h1>&#x25BA; NES Drone</h1>
-<p class="subtitle">NTSC 2A03 · Tanpura Rehearsal Tool · Sa–Pa / Sa–Ma / Sa–Ni</p>
+<!-- ── Header ─────────────────────────────────────────────── -->
+<h1>▶ NES DRONE</h1>
+<p class="tagline">NTSC 2A03 · TANPURA REHEARSAL · SA–PA / SA–MA / SA–NI</p>
 
-<!-- ── PRESETS ──────────────────────────────────────────── -->
-<div style="margin-bottom:14px;">
-  <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">
-    Quick Presets
-    <span style="font-size:9px;margin-left:8px;opacity:0.6">— sets swara + movement; Base Sa unchanged</span>
-  </div>
-  <div style="display:flex;flex-wrap:wrap;gap:6px;" id="presetBtns">
-    <button class="preset-btn" data-preset="sa-pa">Sa · Pa<br><span>Standard — most ragas</span></button>
-    <button class="preset-btn" data-preset="sa-ma">Sa · Ma<br><span>Todi · Bhairavi · Marwa · Purvi</span></button>
-    <button class="preset-btn" data-preset="sa-ni-komal">Sa · Ni♭<br><span>Bhairav · Lalit · Ramkali</span></button>
-    <button class="preset-btn" data-preset="sa-ni-shuddha">Sa · Ni♮<br><span>Bilawal · Yaman · Kalyan</span></button>
-    <button class="preset-btn" data-preset="pa-ma">Pa · Ma<br><span>Rich harmonic — Pa + Ma together</span></button>
-    <button class="preset-btn" data-preset="sa-sa">Sa · Sa<br><span>Pure Sa drone · two octaves</span></button>
-  </div>
+<!-- ── Oscilloscope ───────────────────────────────────────── -->
+<div class="scope-wrap">
+  <canvas id="scope"></canvas>
+  <div class="scope-label" id="scopeLabel">OFFLINE</div>
 </div>
 
-<div class="main-grid">
+<!-- ── Transport ──────────────────────────────────────────── -->
+<div class="transport">
+  <button class="btn-start" id="startBtn">▶ START</button>
+  <button class="btn-stop"  id="stopBtn"  style="display:none">■ STOP</button>
 
-<!-- ── MASTER ─────────────────────────────────────────── -->
-<div class="panel">
-  <div class="panel-title ctrl">Master Control</div>
-
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-    <span class="status-dot" id="statusDot"></span>
-    <span id="statusText" style="font-size:11px;color:var(--muted);">STOPPED</span>
+  <div class="sa-group">
+    <label>BASE SA</label>
+    <input type="text"   class="sa-note" id="noteInput" value="D3" placeholder="D3" title="Note name (D3, C#3, Bb2…)">
+    <input type="number" class="sa-hz"   id="baseSa"   value="146.83" step="0.01" min="10" max="4000" title="Hz">
+    <span class="kattai-badge" id="kattaiBadge">2 kattai</span>
+    <span class="note-err" id="noteErr">?</span>
   </div>
-  <button class="btn start" id="startBtn">▶ START</button>
-  <button class="btn stop"  id="stopBtn" style="display:none">■ STOP</button>
 
-  <div class="sep"></div>
-
-  <div class="vol-row" style="margin-bottom:12px">
-    <label>Volume</label>
+  <div class="vol-group">
+    <label>VOL</label>
     <input type="range" id="masterVol" min="0" max="1" step="0.01" value="0.8">
-    <span class="vol-val" id="masterVolVal">0.80</span>
+    <span id="masterVolVal">0.80</span>
   </div>
 
-  <div class="sep"></div>
-
-  <!-- Linked / free -->
-  <div class="row" style="justify-content:space-between;margin-bottom:4px">
-    <span style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Linked Mode</span>
+  <div class="linked-group">
+    <label>LINKED</label>
     <label class="toggle">
       <input type="checkbox" id="linkedToggle" checked>
       <span class="toggle-slider"></span>
     </label>
   </div>
-  <p class="hint" id="linkedHint" style="margin-bottom:10px">All channels track Base Sa. Toggle off for free control.</p>
+</div>
 
-  <div id="linkedControls">
-    <div class="field">
-      <label>Base Sa <span id="kattaiBadge" class="kattai-badge">2 kattai</span></label>
-      <div class="note-row">
-        <input type="text"   id="noteInput" value="D3" placeholder="D3">
-        <span class="divider">or</span>
-        <input type="number" id="baseSa" value="146.83" step="0.01" min="27.3" max="2000">
+<!-- ── Presets ────────────────────────────────────────────── -->
+<div class="presets-bar">
+  <span class="presets-label">PRESET</span>
+  <button class="preset-btn" data-preset="sa-pa">
+    <b>Sa · Pa</b><span>Standard — most ragas</span>
+  </button>
+  <button class="preset-btn" data-preset="sa-ma">
+    <b>Sa · Ma</b><span>Todi · Bhairavi · Marwa · Purvi</span>
+  </button>
+  <button class="preset-btn" data-preset="sa-ni-komal">
+    <b>Sa · Ni♭</b><span>Bhairav · Lalit · Ramkali</span>
+  </button>
+  <button class="preset-btn" data-preset="sa-ni-shuddha">
+    <b>Sa · Ni♮</b><span>Yaman · Kalyan · Bilawal</span>
+  </button>
+  <button class="preset-btn" data-preset="pa-ma">
+    <b>Pa · Ma</b><span>Rich harmonic drone</span>
+  </button>
+  <button class="preset-btn" data-preset="sa-sa">
+    <b>Sa · Sa↑</b><span>Pure octave drone</span>
+  </button>
+</div>
+
+<!-- ── Channels ───────────────────────────────────────────── -->
+<div class="channels">
+
+  <!-- Kharaj (Triangle) -->
+  <div class="channel">
+    <div class="channel-header">
+      <span class="ch-name tri">KHARAJ</span>
+      <span class="ch-role">Bass Sa · Sa÷2</span>
+      <label class="toggle" title="On/Off">
+        <input type="checkbox" id="triOn" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="channel-body">
+      <div class="freq-box">
+        <div class="freq-big" id="triFreqDisplay">73.415 Hz</div>
+        <div class="freq-sub">Triangle · 32-step · Fixed amplitude</div>
       </div>
-      <span id="noteError" style="font-size:10px;color:var(--warn);margin-top:3px;display:none">⚠ Unknown note — try D3, C#3, Bb2</span>
-    </div>
-    <p class="hint">Tanpura: Kharaj (bass)=Sa/2 · String=Sa · Jiva=swara.<br>
-    Typical ranges: Female C#3–E3 (1.5–3 k) · Male G#2–B2 (5–6.5 k)</p>
-  </div>
 
-  <div class="sep"></div>
-  <div class="section-label">Drone Movement</div>
+      <!-- Free-mode input -->
+      <input type="number" class="free-freq" id="triFreq" value="73.415" step="0.001" min="0.01">
 
-  <div class="field">
-    <label>Pitch Drift (¢ peak)</label>
-    <div class="vol-row" style="margin-bottom:0">
-      <input type="range" id="driftDepth" min="0" max="30" step="0.5" value="8">
-      <span class="vol-val" id="driftDepthVal">8</span>
-    </div>
-  </div>
-  <div class="field">
-    <label>Drift Speed (Hz)</label>
-    <div class="vol-row" style="margin-bottom:0">
-      <input type="range" id="driftRate" min="0.04" max="0.5" step="0.01" value="0.13">
-      <span class="vol-val" id="driftRateVal">0.13</span>
+      <details class="ch-adv">
+        <summary>NES READOUT</summary>
+        <div style="margin-top:6px">
+          <div class="readout">
+            <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="triPeriod">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="triActual">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="triCents">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="triMuted">—</span></div>
+          </div>
+          <p class="hint-text" style="margin-top:6px">Muted when t&lt;2 · Lowest ≈27.3 Hz (t=2047) · No volume control on hardware</p>
+        </div>
+      </details>
     </div>
   </div>
-  <div class="field">
-    <label>Volume Swell (%)</label>
-    <div class="vol-row" style="margin-bottom:0">
-      <input type="range" id="swellDepth" min="0" max="1" step="0.01" value="0.45">
-      <span class="vol-val" id="swellDepthVal">45%</span>
+
+  <!-- String 1 (Pulse 1) -->
+  <div class="channel">
+    <div class="channel-header">
+      <span class="ch-name p1">STRING 1</span>
+      <span class="ch-role" id="p1RoleLabel">Sa · root</span>
+      <label class="toggle" title="On/Off">
+        <input type="checkbox" id="p1On" checked>
+        <span class="toggle-slider"></span>
+      </label>
     </div>
-  </div>
-  <div class="field">
-    <label>Swell Speed (Hz)</label>
-    <div class="vol-row" style="margin-bottom:0">
-      <input type="range" id="swellRate" min="0.05" max="0.5" step="0.01" value="0.18">
-      <span class="vol-val" id="swellRateVal">0.18</span>
-    </div>
-  </div>
-  <p class="hint">Each channel is staggered ⅓ cycle — mimics tanpura string pluck sequence. Pulse vol steps through 4-bit NES levels.</p>
-
-  <div class="sep"></div>
-  <div class="section-label">Vibrato</div>
-  <div class="field">
-    <label>Depth (¢)</label>
-    <div class="vol-row" style="margin-bottom:0">
-      <input type="range" id="vibDepth" min="0" max="20" step="0.5" value="0">
-      <span class="vol-val" id="vibDepthVal">0</span>
-    </div>
-  </div>
-  <div class="field">
-    <label>Rate (Hz)</label>
-    <div class="vol-row" style="margin-bottom:0">
-      <input type="range" id="vibRate" min="0.5" max="12" step="0.1" value="5">
-      <span class="vol-val" id="vibRateVal">5.0</span>
-    </div>
-  </div>
-  <p class="hint">∿ Smoothed LFO — real NES vibrato steps at 60 Hz frame rate.</p>
-</div>
-
-<!-- ── TRIANGLE (Kharaj — low Sa) ────────────────────── -->
-<div class="panel">
-  <div class="panel-title tri">
-    <span>Kharaj <small>triangle</small></span>
-    <span style="font-size:9px;opacity:0.5">Bass Sa</span>
-  </div>
-
-  <div class="row">
-    <label>On</label>
-    <label class="toggle"><input type="checkbox" id="triOn" checked><span class="toggle-slider"></span></label>
-  </div>
-
-  <!-- Free mode freq input (hidden in linked) -->
-  <div id="triFreqField" class="field" style="display:none">
-    <label>Target Freq (Hz)</label>
-    <input type="number" id="triFreq" value="73.415" step="0.001" min="0.01" max="10000">
-  </div>
-
-  <div class="freq-display" id="triFreqReadout">
-    <div class="big" id="triFreqDisplay">73.415 Hz</div>
-    <div class="role">Sa ÷ 2 · Kharaj string · lowest octave</div>
-  </div>
-
-  <div class="readout">
-    <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="triPeriod">—</span></div>
-    <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="triActual">—</span></div>
-    <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="triCents">—</span></div>
-    <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="triMuted">—</span></div>
-  </div>
-
-  <div class="sep"></div>
-  <p class="hint">
-    32-step 4-bit waveform · Fixed full amplitude · Muted when t &lt; 2.<br>
-    Lowest: ≈27.3 Hz (t=2047) · No volume or duty control.
-  </p>
-</div>
-
-<!-- ── PULSE 1 (Middle Sa / jiva string) ─────────────── -->
-<div class="panel">
-  <div class="panel-title p1">
-    <span>String 1 <small>pulse 1</small></span>
-    <span id="p1SwaraLabel" style="font-size:9px;opacity:0.7">Sa</span>
-  </div>
-
-  <div class="row">
-    <label>On</label>
-    <label class="toggle"><input type="checkbox" id="p1On" checked><span class="toggle-slider"></span></label>
-  </div>
-
-  <!-- Free mode -->
-  <div id="p1FreqField" class="field" style="display:none">
-    <label>Target Freq (Hz)</label>
-    <input type="number" id="p1Freq" value="146.83" step="0.001" min="0.01" max="10000">
-  </div>
-
-  <!-- Linked mode: swara selector -->
-  <div id="p1SwaraControls">
-    <div class="field" style="margin-bottom:6px">
-      <label>Swara</label>
-      <div class="swara-grid" id="p1SwaraBtns">
-        <button class="swara-btn active" data-ratio="1"      data-name="Sa">Sa<small>1:1</small></button>
-        <button class="swara-btn"        data-ratio="1.5"    data-name="Pa">Pa<small>3:2</small></button>
-        <button class="swara-btn"        data-ratio="1.3333" data-name="Ma">Ma<small>4:3</small></button>
-        <button class="swara-btn"        data-ratio="1.7778" data-name="Ni♭">Ni♭<small>16:9</small></button>
-        <button class="swara-btn"        data-ratio="1.875"  data-name="Ni♮">Ni♮<small>15:8</small></button>
-        <button class="swara-btn"        data-ratio="2.0"    data-name="Sa↑">Sa↑<small>2:1</small></button>
+    <div class="channel-body">
+      <div class="freq-box">
+        <div class="freq-big" id="p1FreqDisplay">146.830 Hz</div>
+        <div class="freq-sub" id="p1FreqSub">Pulse 1 · 25% duty</div>
       </div>
-    </div>
-  </div>
 
-  <div class="freq-display">
-    <div class="big" id="p1FreqDisplay">146.830 Hz</div>
-    <div class="role" id="p1RoleLabel">Sa · root · middle octave</div>
-  </div>
-
-  <div class="field">
-    <label>Duty Cycle</label>
-    <div class="duty-btns" id="p1DutyBtns">
-      <button class="duty-btn" data-duty="0.125">12.5%</button>
-      <button class="duty-btn active" data-duty="0.25">25%</button>
-      <button class="duty-btn" data-duty="0.5">50%</button>
-    </div>
-  </div>
-  <div class="vol-row">
-    <label>Vol (0–15)</label>
-    <input type="range" id="p1Vol" min="0" max="15" step="1" value="12">
-    <span class="vol-val" id="p1VolVal">12</span>
-  </div>
-
-  <div class="readout">
-    <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="p1Period">—</span></div>
-    <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="p1Actual">—</span></div>
-    <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="p1Cents">—</span></div>
-    <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="p1Muted">—</span></div>
-  </div>
-  <div class="sep"></div>
-  <p class="hint">11-bit timer · 4-bit vol · Muted t&lt;8 · Lowest ≈54.6 Hz</p>
-</div>
-
-<!-- ── PULSE 2 (Jiva / swara string) ─────────────────── -->
-<div class="panel">
-  <div class="panel-title p2">
-    <span>String 2 <small>pulse 2</small></span>
-    <span id="p2SwaraLabel" style="font-size:9px;opacity:0.7">Pa</span>
-  </div>
-
-  <div class="row">
-    <label>On</label>
-    <label class="toggle"><input type="checkbox" id="p2On" checked><span class="toggle-slider"></span></label>
-  </div>
-
-  <!-- Free mode -->
-  <div id="p2FreqField" class="field" style="display:none">
-    <label>Target Freq (Hz)</label>
-    <input type="number" id="p2Freq" value="220.245" step="0.001" min="0.01" max="10000">
-  </div>
-
-  <!-- Linked mode: swara selector -->
-  <div id="p2SwaraControls">
-    <div class="field" style="margin-bottom:6px">
-      <label>Swara</label>
-      <div class="swara-grid" id="p2SwaraBtns">
-        <button class="swara-btn"        data-ratio="1"      data-name="Sa">Sa<small>1:1</small></button>
-        <button class="swara-btn active" data-ratio="1.5"    data-name="Pa">Pa<small>3:2</small></button>
-        <button class="swara-btn"        data-ratio="1.3333" data-name="Ma">Ma<small>4:3</small></button>
-        <button class="swara-btn"        data-ratio="1.7778" data-name="Ni♭">Ni♭<small>16:9</small></button>
-        <button class="swara-btn"        data-ratio="1.875"  data-name="Ni♮">Ni♮<small>15:8</small></button>
-        <button class="swara-btn"        data-ratio="2.0"    data-name="Sa↑">Sa↑<small>2:1</small></button>
+      <!-- Linked: swara selector -->
+      <div id="p1SwaraGrid" class="swara-grid">
+        <button class="sw-btn active" data-name="Sa" >Sa<small>1:1</small></button>
+        <button class="sw-btn"        data-name="Pa" >Pa<small>3:2</small></button>
+        <button class="sw-btn"        data-name="Ma" >Ma<small>4:3</small></button>
+        <button class="sw-btn"        data-name="Ni♭">Ni♭<small>16:9</small></button>
+        <button class="sw-btn"        data-name="Ni♮">Ni♮<small>15:8</small></button>
+        <button class="sw-btn"        data-name="Sa↑">Sa↑<small>2:1</small></button>
       </div>
+
+      <!-- Free-mode input -->
+      <input type="number" class="free-freq" id="p1Freq" value="146.83" step="0.001" min="0.01">
+
+      <details class="ch-adv">
+        <summary>TIMBRE &amp; TUNING</summary>
+        <div style="margin-top:8px">
+          <div style="font-size:9px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">DUTY CYCLE</div>
+          <div class="duty-row" id="p1DutyBtns">
+            <button class="duty-btn"        data-duty="0.125">12.5%</button>
+            <button class="duty-btn active" data-duty="0.25" >25%</button>
+            <button class="duty-btn"        data-duty="0.5"  >50%</button>
+          </div>
+          <div class="ctrl-row">
+            <label>VOL</label>
+            <input type="range" id="p1Vol" min="0" max="15" step="1" value="12">
+            <span class="ctrl-val" id="p1VolVal">12</span>
+          </div>
+          <div class="sep"></div>
+          <div class="readout">
+            <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="p1Period">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="p1Actual">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="p1Cents">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="p1Muted">—</span></div>
+          </div>
+          <p class="hint-text" style="margin-top:6px">Muted when t&lt;8 · Lowest ≈54.6 Hz (t=2047)</p>
+        </div>
+      </details>
     </div>
   </div>
 
-  <div class="freq-display">
-    <div class="big" id="p2FreqDisplay">220.245 Hz</div>
-    <div class="role" id="p2RoleLabel">Pa · perfect fifth (3:2)</div>
-  </div>
+  <!-- String 2 (Pulse 2) -->
+  <div class="channel">
+    <div class="channel-header">
+      <span class="ch-name p2">STRING 2</span>
+      <span class="ch-role" id="p2RoleLabel">Pa · 3:2</span>
+      <label class="toggle" title="On/Off">
+        <input type="checkbox" id="p2On" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="channel-body">
+      <div class="freq-box">
+        <div class="freq-big" id="p2FreqDisplay">220.245 Hz</div>
+        <div class="freq-sub" id="p2FreqSub">Pulse 2 · 25% duty</div>
+      </div>
 
-  <div class="field">
-    <label>Duty Cycle</label>
-    <div class="duty-btns" id="p2DutyBtns">
-      <button class="duty-btn" data-duty="0.125">12.5%</button>
-      <button class="duty-btn active" data-duty="0.25">25%</button>
-      <button class="duty-btn" data-duty="0.5">50%</button>
+      <!-- Linked: swara selector -->
+      <div id="p2SwaraGrid" class="swara-grid">
+        <button class="sw-btn"        data-name="Sa" >Sa<small>1:1</small></button>
+        <button class="sw-btn active" data-name="Pa" >Pa<small>3:2</small></button>
+        <button class="sw-btn"        data-name="Ma" >Ma<small>4:3</small></button>
+        <button class="sw-btn"        data-name="Ni♭">Ni♭<small>16:9</small></button>
+        <button class="sw-btn"        data-name="Ni♮">Ni♮<small>15:8</small></button>
+        <button class="sw-btn"        data-name="Sa↑">Sa↑<small>2:1</small></button>
+      </div>
+
+      <!-- Free-mode input -->
+      <input type="number" class="free-freq" id="p2Freq" value="220.245" step="0.001" min="0.01">
+
+      <details class="ch-adv">
+        <summary>TIMBRE &amp; TUNING</summary>
+        <div style="margin-top:8px">
+          <div style="font-size:9px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">DUTY CYCLE</div>
+          <div class="duty-row" id="p2DutyBtns">
+            <button class="duty-btn"        data-duty="0.125">12.5%</button>
+            <button class="duty-btn active" data-duty="0.25" >25%</button>
+            <button class="duty-btn"        data-duty="0.5"  >50%</button>
+          </div>
+          <div class="ctrl-row">
+            <label>VOL</label>
+            <input type="range" id="p2Vol" min="0" max="15" step="1" value="9">
+            <span class="ctrl-val" id="p2VolVal">9</span>
+          </div>
+          <div class="ctrl-row">
+            <label>SHIMMER</label>
+            <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="7">
+            <span class="ctrl-val" id="p2DetuneVal">+7¢</span>
+          </div>
+          <p class="hint-text">Detune shifts target before period snap — beats against String 1 for shimmer.</p>
+          <div class="sep"></div>
+          <div class="readout">
+            <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="p2Period">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="p2Actual">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="p2Cents">—</span></div>
+            <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="p2Muted">—</span></div>
+          </div>
+          <p class="hint-text" style="margin-top:6px">Muted when t&lt;8 · Lowest ≈54.6 Hz (t=2047)</p>
+        </div>
+      </details>
     </div>
   </div>
-  <div class="vol-row">
-    <label>Vol (0–15)</label>
-    <input type="range" id="p2Vol" min="0" max="15" step="1" value="9">
-    <span class="vol-val" id="p2VolVal">9</span>
-  </div>
-  <div class="field">
-    <label>Shimmer detune (±25 ¢)</label>
-    <div class="vol-row" style="margin-bottom:0">
-      <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="7">
-      <span class="vol-val" id="p2DetuneVal">+7</span>
+
+</div><!-- .channels -->
+
+<!-- ── Movement & Vibrato ──────────────────────────────────── -->
+<details class="mv-panel">
+  <summary>MOVEMENT &amp; VIBRATO <span style="font-size:9px;color:var(--dim);margin-left:8px">(software simulation — not NES hardware)</span></summary>
+  <div class="mv-body">
+    <div>
+      <div class="mv-section-label">DRONE DRIFT</div>
+      <div class="ctrl-row">
+        <label>DEPTH</label>
+        <input type="range" id="driftDepth" min="0" max="30" step="0.5" value="8">
+        <span class="ctrl-val" id="driftDepthVal">8¢</span>
+      </div>
+      <div class="ctrl-row">
+        <label>SPEED</label>
+        <input type="range" id="driftRate" min="0.04" max="0.5" step="0.01" value="0.13">
+        <span class="ctrl-val" id="driftRateVal">0.13</span>
+      </div>
+      <div class="ctrl-row">
+        <label>SWELL</label>
+        <input type="range" id="swellDepth" min="0" max="1" step="0.01" value="0.45">
+        <span class="ctrl-val" id="swellDepthVal">45%</span>
+      </div>
+      <div class="ctrl-row">
+        <label>SW SPD</label>
+        <input type="range" id="swellRate" min="0.05" max="0.5" step="0.01" value="0.18">
+        <span class="ctrl-val" id="swellRateVal">0.18</span>
+      </div>
+      <p class="hint-text">3-partial LFO per channel at offset rates (×0.93/1.0/×1.07) — channels cross in and out of phase over ~55s cycles. Pulse vol steps through 4-bit NES levels (0–15).</p>
+    </div>
+    <div>
+      <div class="mv-section-label">VIBRATO</div>
+      <div class="ctrl-row">
+        <label>DEPTH</label>
+        <input type="range" id="vibDepth" min="0" max="20" step="0.5" value="0">
+        <span class="ctrl-val" id="vibDepthVal">0¢</span>
+      </div>
+      <div class="ctrl-row">
+        <label>RATE</label>
+        <input type="range" id="vibRate" min="0.5" max="12" step="0.1" value="5">
+        <span class="ctrl-val" id="vibRateVal">5.0</span>
+      </div>
+      <p class="hint-text">Smooth LFO — real NES vibrato would step between integer period values at the 60 Hz frame rate.</p>
     </div>
   </div>
-
-  <div class="readout">
-    <div class="readout-row"><span class="readout-label">Period t</span><span class="readout-val" id="p2Period">—</span></div>
-    <div class="readout-row"><span class="readout-label">Actual Hz</span><span class="readout-val" id="p2Actual">—</span></div>
-    <div class="readout-row"><span class="readout-label">Error</span><span class="readout-val" id="p2Cents">—</span></div>
-    <div class="readout-row"><span class="readout-label">Status</span><span class="readout-val" id="p2Muted">—</span></div>
-  </div>
-  <div class="sep"></div>
-  <p class="hint">Detune shifts target before period snap — beating shimmer vs String 1.</p>
-</div>
-
-</div><!-- .main-grid -->
+</details>
 
 <script>
-// ── NES constants ──────────────────────────────────────────
+// ── NES constants & helpers ────────────────────────────────
 const CPU = 1789773;
 function freqToPulsePeriod(f) { return Math.round(CPU / (16 * f) - 1); }
 function freqToTriPeriod(f)   { return Math.round(CPU / (32 * f) - 1); }
 function pulseActualFreq(t)   { return CPU / (16 * (t + 1)); }
 function triActualFreq(t)     { return CPU / (32 * (t + 1)); }
-function centsErr(actual, target) { return 1200 * Math.log2(actual / target); }
+function centsErr(a, b)       { return 1200 * Math.log2(a / b); }
 function clamp(v, lo, hi)     { return Math.max(lo, Math.min(hi, v)); }
-function detunedFreq(f, c)    { return f * Math.pow(2, c / 1200); }
+function detF(f, c)           { return f * Math.pow(2, c / 1200); }
 
-// ── Note / Kattai helpers ──────────────────────────────────
-const NOTE_NAMES    = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-const LETTER_SEMI   = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
-// Kattai: C=1, C#=1.5, D=2, D#=2.5, E=3, F=3.5, F#=4, G=4.5, G#=5, A=5.5, A#=6, B=6.5
-const KATTAI        = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5];
+// ── Exact just-intonation ratios (key: swara name) ────────
+const RATIOS = {
+  'Sa':  1,
+  'Pa':  3/2,
+  'Ma':  4/3,
+  'Ni♭': 16/9,
+  'Ni♮': 15/8,
+  'Sa↑': 2,
+};
+const RATIO_LABEL = {
+  'Sa':  'Sa · root (1:1)',
+  'Pa':  'Pa · fifth (3:2)',
+  'Ma':  'Ma · fourth (4:3)',
+  'Ni♭': 'Ni♭ · min 7th (16:9)',
+  'Ni♮': 'Ni♮ · maj 7th (15:8)',
+  'Sa↑': 'Sa↑ · octave (2:1)',
+};
+
+// ── Note / kattai helpers ──────────────────────────────────
+const NOTE_NAMES  = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const LETTER_SEMI = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+const KATTAI      = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5];
 
 function noteToHz(str) {
   const m = str.trim().match(/^([A-Ga-g])([#b♯♭]?)\s*(-?\d+)$/);
   if (!m) return null;
   let semi = LETTER_SEMI[m[1].toUpperCase()];
   if (semi === undefined) return null;
-  if (m[2] === '#' || m[2] === '♯') semi += 1;
-  else if (m[2] === 'b' || m[2] === '♭') semi -= 1;
+  const acc = m[2];
+  if (acc === '#' || acc === '♯') semi++;
+  else if (acc === 'b' || acc === '♭') semi--;
   const midi = 12 * (parseInt(m[3], 10) + 1) + semi;
-  return 440 * Math.pow(2, (midi - 69) / 12);
+  const hz = 440 * Math.pow(2, (midi - 69) / 12);
+  return (hz > 0 && isFinite(hz)) ? hz : null;
 }
 
 function hzToNote(hz) {
-  const midi  = Math.round(69 + 12 * Math.log2(hz / 440));
-  const semi  = ((midi % 12) + 12) % 12;
-  const oct   = Math.floor(midi / 12) - 1;
-  return NOTE_NAMES[semi] + oct;
+  if (!hz || hz <= 0 || !isFinite(hz)) return '?';
+  const midi = Math.round(69 + 12 * Math.log2(hz / 440));
+  return NOTE_NAMES[((midi % 12) + 12) % 12] + (Math.floor(midi / 12) - 1);
 }
 
 function hzToKattai(hz) {
-  const midi  = Math.round(69 + 12 * Math.log2(hz / 440));
-  const semi  = ((midi % 12) + 12) % 12;
-  return KATTAI[semi] + ' kattai';
+  if (!hz || hz <= 0 || !isFinite(hz)) return '—';
+  const midi = Math.round(69 + 12 * Math.log2(hz / 440));
+  return KATTAI[((midi % 12) + 12) % 12] + ' kattai';
 }
 
 // ── State ──────────────────────────────────────────────────
-const SWARA_ROLES = {
-  'Sa':  'Sa · root',
-  'Pa':  'Pa · perfect fifth (3:2)',
-  'Ma':  'Ma · fourth (4:3)',
-  'Ni♭': 'Ni♭ · minor seventh (16:9)',
-  'Ni♮': 'Ni♮ · major seventh (15:8)',
-  'Sa↑': 'Sa↑ · octave (2:1)',
-};
-
 const state = {
   linked: true,
   baseSa: 146.83,
   masterVolume: 0.8,
-  vibratoDepth: 0,
-  vibratoRate: 5,
-  driftDepth: 8,
-  driftRate: 0.13,
-  swellDepth: 0.45,
-  swellRate: 0.18,
-  triangle: { on: true,  freq: 73.415 },
-  pulse1:   { on: true,  freq: 146.83,  duty: 0.25, vol: 12, detuneCents: 0,  swaraRatio: 1,   swaraName: 'Sa'  },
-  pulse2:   { on: true,  freq: 220.245, duty: 0.25, vol: 9,  detuneCents: 7,  swaraRatio: 1.5, swaraName: 'Pa'  },
+  driftDepth: 8, driftRate: 0.13,
+  swellDepth: 0.45, swellRate: 0.18,
+  vibratoDepth: 0, vibratoRate: 5,
+  triangle: { on: true, freq: 73.415 },
+  pulse1:   { on: true, freq: 146.83,  duty: 0.25, vol: 12, detuneCents: 0,  swaraName: 'Sa'  },
+  pulse2:   { on: true, freq: 220.245, duty: 0.25, vol: 9,  detuneCents: 7,  swaraName: 'Pa'  },
 };
 
 // ── Audio ──────────────────────────────────────────────────
-let audioCtx = null;
-let workletNode = null;
+let audioCtx = null, workletNode = null, analyser = null;
 
 async function startAudio() {
   if (audioCtx) return;
@@ -536,11 +765,14 @@ async function startAudio() {
   workletNode = new AudioWorkletNode(audioCtx, 'nes-processor', {
     numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [1],
   });
-  workletNode.connect(audioCtx.destination);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+  analyser.smoothingTimeConstant = 0.3;
+  workletNode.connect(analyser);
+  analyser.connect(audioCtx.destination);
   sendAll();
 }
 
-// Always send the full state — no partial updates, avoids stale state bugs.
 function sendAll() {
   if (!workletNode) return;
   workletNode.port.postMessage({
@@ -554,111 +786,169 @@ function sendAll() {
       pulse1:   { ...state.pulse1 },
       pulse2:   { ...state.pulse2 },
       triangle: { ...state.triangle },
-    }
+    },
   });
 }
 
 function stopAudio() {
   if (workletNode) { workletNode.disconnect(); workletNode = null; }
-  if (audioCtx)    { audioCtx.close(); audioCtx = null; }
+  if (analyser)    { analyser.disconnect();    analyser    = null; }
+  if (audioCtx)    { audioCtx.close();         audioCtx    = null; }
 }
 
-// ── Linked: recompute all freqs from baseSa ────────────────
+// ── Oscilloscope ───────────────────────────────────────────
+const scopeCanvas = document.getElementById('scope');
+const ctx2d = scopeCanvas.getContext('2d');
+const scopeLabel = document.getElementById('scopeLabel');
+let scopeBuf = null;
+
+function resizeScope() {
+  scopeCanvas.width  = scopeCanvas.offsetWidth  * devicePixelRatio;
+  scopeCanvas.height = scopeCanvas.offsetHeight * devicePixelRatio;
+}
+resizeScope();
+window.addEventListener('resize', resizeScope);
+
+function drawScope() {
+  requestAnimationFrame(drawScope);
+  const W = scopeCanvas.width, H = scopeCanvas.height;
+  ctx2d.fillStyle = '#020208';
+  ctx2d.fillRect(0, 0, W, H);
+
+  if (analyser) {
+    if (!scopeBuf || scopeBuf.length !== analyser.fftSize) {
+      scopeBuf = new Float32Array(analyser.fftSize);
+    }
+    analyser.getFloatTimeDomainData(scopeBuf);
+
+    // Phosphor glow: draw twice, blurred then sharp
+    for (let pass = 0; pass < 2; pass++) {
+      ctx2d.shadowBlur  = pass === 0 ? 10 : 2;
+      ctx2d.shadowColor = var_phosphor;
+      ctx2d.strokeStyle = pass === 0 ? 'rgba(0,255,102,0.4)' : '#00ff66';
+      ctx2d.lineWidth   = pass === 0 ? 2.5 : 1.5;
+      ctx2d.beginPath();
+      const step = Math.max(1, Math.floor(scopeBuf.length / W));
+      for (let x = 0; x < W; x++) {
+        const idx = Math.floor(x * scopeBuf.length / W);
+        const y   = H / 2 - scopeBuf[idx] * H * 0.42;
+        x === 0 ? ctx2d.moveTo(x, y) : ctx2d.lineTo(x, y);
+      }
+      ctx2d.stroke();
+    }
+  } else {
+    // Stopped: dim flat line
+    ctx2d.shadowBlur = 0;
+    ctx2d.strokeStyle = '#112211';
+    ctx2d.lineWidth = 1;
+    ctx2d.beginPath();
+    ctx2d.moveTo(0, H / 2);
+    ctx2d.lineTo(W, H / 2);
+    ctx2d.stroke();
+  }
+
+  // Scanline overlay
+  ctx2d.shadowBlur = 0;
+  ctx2d.fillStyle = 'rgba(0,0,0,0.18)';
+  for (let y = 0; y < H; y += Math.ceil(devicePixelRatio * 2)) {
+    ctx2d.fillRect(0, y, W, Math.ceil(devicePixelRatio));
+  }
+}
+// CSS variable can't be read by canvas context — capture once
+const var_phosphor = getComputedStyle(document.documentElement).getPropertyValue('--phosphor').trim() || '#00ff66';
+drawScope();
+
+// ── Linked: apply Sa to all channels ──────────────────────
 function applyLinked() {
   const sa = state.baseSa;
   state.triangle.freq = sa / 2;
-  state.pulse1.freq   = sa * state.pulse1.swaraRatio;
-  state.pulse2.freq   = sa * state.pulse2.swaraRatio;
+  state.pulse1.freq   = sa * RATIOS[state.pulse1.swaraName];
+  state.pulse2.freq   = sa * RATIOS[state.pulse2.swaraName];
 
-  // Update displays
-  document.getElementById('triFreqDisplay').textContent = (sa / 2).toFixed(3) + ' Hz';
+  document.getElementById('triFreqDisplay').textContent = fmtHz(sa / 2);
   updatePulseDisplay(1);
   updatePulseDisplay(2);
-
-  // Kattai badge
   document.getElementById('kattaiBadge').textContent = hzToKattai(sa);
-
   sendAll();
   updateReadouts();
 }
 
+function fmtHz(hz) { return hz.toFixed(3) + ' Hz'; }
+
 function updatePulseDisplay(n) {
-  const ch   = n === 1 ? state.pulse1 : state.pulse2;
-  const pfx  = 'p' + n;
-  document.getElementById(pfx + 'FreqDisplay').textContent  = ch.freq.toFixed(3) + ' Hz';
-  document.getElementById(pfx + 'RoleLabel').textContent    = SWARA_ROLES[ch.swaraName] || ch.swaraName;
-  document.getElementById(pfx + 'SwaraLabel').textContent   = ch.swaraName;
+  const ch  = n === 1 ? state.pulse1 : state.pulse2;
+  const pfx = 'p' + n;
+  const dutyPct = Math.round(ch.duty * 100);
+  document.getElementById(pfx + 'FreqDisplay').textContent = fmtHz(ch.freq);
+  document.getElementById(pfx + 'RoleLabel').textContent   = RATIO_LABEL[ch.swaraName] || ch.swaraName;
+  document.getElementById(pfx + 'FreqSub').textContent     = `Pulse ${n} · ${dutyPct}% duty`;
 }
 
-// ── Readouts ───────────────────────────────────────────────
-function setReadout(prefix, freq, on, isPulse) {
-  const t = isPulse
-    ? clamp(freqToPulsePeriod(freq), 0, 2047)
-    : clamp(freqToTriPeriod(freq),   0, 2047);
-  const minT  = isPulse ? 8 : 2;
-  const muted = !on || t < minT;
+// ── NES readouts ───────────────────────────────────────────
+function setReadout(pfx, targetFreq, on, isPulse) {
+  const t      = isPulse
+    ? clamp(freqToPulsePeriod(targetFreq), 0, 2047)
+    : clamp(freqToTriPeriod(targetFreq),   0, 2047);
+  const minT   = isPulse ? 8 : 2;
+  const muted  = !on || t < minT;
   const actual = isPulse ? pulseActualFreq(t) : triActualFreq(t);
-  const err    = centsErr(actual, freq);
+  const err    = centsErr(actual, targetFreq);
 
-  document.getElementById(prefix + 'Period').textContent = t;
-  document.getElementById(prefix + 'Actual').textContent = actual.toFixed(3) + ' Hz';
-  const cEl = document.getElementById(prefix + 'Cents');
-  cEl.textContent  = (err >= 0 ? '+' : '') + err.toFixed(1) + ' ¢';
-  cEl.className    = 'readout-val ' + (Math.abs(err) < 1 ? 'ok' : 'warn');
-  const mEl = document.getElementById(prefix + 'Muted');
-  mEl.textContent  = muted ? (t < minT ? `MUTED (t<${minT})` : 'OFF') : 'ACTIVE';
-  mEl.className    = 'readout-val ' + (muted ? 'warn' : 'ok');
+  document.getElementById(pfx + 'Period').textContent = t;
+  document.getElementById(pfx + 'Actual').textContent = actual.toFixed(3) + ' Hz';
+
+  const cEl = document.getElementById(pfx + 'Cents');
+  cEl.textContent = (err >= 0 ? '+' : '') + err.toFixed(1) + ' ¢';
+  cEl.className   = 'ro-val ' + (Math.abs(err) < 1 ? 'ok' : 'warn');
+
+  const mEl = document.getElementById(pfx + 'Muted');
+  mEl.textContent = muted ? (t < minT ? `MUTED t<${minT}` : 'OFF') : 'ACTIVE';
+  mEl.className   = 'ro-val ' + (muted ? 'warn' : 'ok');
 }
 
 function updateReadouts() {
-  setReadout('tri', state.triangle.freq, state.triangle.on, false);
-  setReadout('p1',  detunedFreq(state.pulse1.freq, state.pulse1.detuneCents), state.pulse1.on, true);
-  setReadout('p2',  detunedFreq(state.pulse2.freq, state.pulse2.detuneCents), state.pulse2.on, true);
+  setReadout('tri', state.triangle.freq,                           state.triangle.on, false);
+  setReadout('p1',  detF(state.pulse1.freq, state.pulse1.detuneCents), state.pulse1.on,   true);
+  setReadout('p2',  detF(state.pulse2.freq, state.pulse2.detuneCents), state.pulse2.on,   true);
 }
 
-// ── Linked / free toggle ───────────────────────────────────
+// ── Linked / free mode ─────────────────────────────────────
 function setLinkedMode(on) {
   state.linked = on;
-  ['tri', 'p1', 'p2'].forEach(p => {
-    const freeEl = document.getElementById(p + 'FreqField');
-    if (freeEl) freeEl.style.display = on ? 'none' : 'flex';
-    // Freq readout box — always visible
+  document.querySelectorAll('.free-freq').forEach(el => {
+    el.style.display = on ? 'none' : 'block';
   });
-  document.getElementById('linkedControls').style.display = on ? 'block' : 'none';
-  document.getElementById('p1SwaraControls').style.display = on ? 'block' : 'none';
-  document.getElementById('p2SwaraControls').style.display = on ? 'block' : 'none';
-  document.getElementById('linkedHint').textContent = on
-    ? 'All channels track Base Sa. Toggle off for free control.'
-    : 'Free mode — each channel is independent.';
+  document.getElementById('p1SwaraGrid').style.display = on ? 'grid' : 'none';
+  document.getElementById('p2SwaraGrid').style.display = on ? 'grid' : 'none';
   if (on) applyLinked();
   else    updateReadouts();
 }
 
-// ── Duty buttons ───────────────────────────────────────────
-function setupDutyButtons(containerId, ch) {
-  document.getElementById(containerId).querySelectorAll('.duty-btn').forEach(btn => {
+// ── Swara buttons ──────────────────────────────────────────
+function setupSwaraButtons(gridId, n) {
+  document.getElementById(gridId).querySelectorAll('.sw-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.getElementById(containerId).querySelectorAll('.duty-btn')
+      document.getElementById(gridId).querySelectorAll('.sw-btn')
         .forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      ch.duty = parseFloat(btn.dataset.duty);
-      sendAll();
+      const ch = n === 1 ? state.pulse1 : state.pulse2;
+      ch.swaraName = btn.dataset.name; // name → ratio lookup via RATIOS[]
+      if (state.linked) applyLinked();
+      else { updatePulseDisplay(n); sendAll(); updateReadouts(); }
     });
   });
 }
 
-// ── Swara buttons (per pulse) ──────────────────────────────
-function setupSwaraButtons(containerId, n) {
-  document.getElementById(containerId).querySelectorAll('.swara-btn').forEach(btn => {
+// ── Duty buttons ───────────────────────────────────────────
+function setupDutyButtons(groupId, ch, n) {
+  document.getElementById(groupId).querySelectorAll('.duty-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.getElementById(containerId).querySelectorAll('.swara-btn')
+      document.getElementById(groupId).querySelectorAll('.duty-btn')
         .forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const ch = n === 1 ? state.pulse1 : state.pulse2;
-      ch.swaraRatio = parseFloat(btn.dataset.ratio);
-      ch.swaraName  = btn.dataset.name;
-      if (state.linked) applyLinked();
-      else { updatePulseDisplay(n); sendAll(); updateReadouts(); }
+      ch.duty = parseFloat(btn.dataset.duty);
+      if (n) updatePulseDisplay(n);
+      sendAll();
     });
   });
 }
@@ -666,33 +956,118 @@ function setupSwaraButtons(containerId, n) {
 // ── Start / Stop ───────────────────────────────────────────
 document.getElementById('startBtn').addEventListener('click', async () => {
   await startAudio();
-  document.getElementById('statusDot').className  = 'status-dot running';
-  document.getElementById('statusText').textContent = 'RUNNING';
-  document.getElementById('statusText').style.color = 'var(--green)';
   document.getElementById('startBtn').style.display = 'none';
-  document.getElementById('stopBtn').style.display  = 'block';
+  document.getElementById('stopBtn').style.display  = '';
+  scopeLabel.textContent = 'LIVE';
+  scopeLabel.className   = 'scope-label live';
   updateReadouts();
 });
 document.getElementById('stopBtn').addEventListener('click', () => {
   stopAudio();
-  document.getElementById('statusDot').className  = 'status-dot';
-  document.getElementById('statusText').textContent = 'STOPPED';
-  document.getElementById('statusText').style.color = 'var(--muted)';
-  document.getElementById('startBtn').style.display = 'block';
+  document.getElementById('startBtn').style.display = '';
   document.getElementById('stopBtn').style.display  = 'none';
+  scopeLabel.textContent = 'OFFLINE';
+  scopeLabel.className   = 'scope-label';
 });
 
-// ── Master vol ─────────────────────────────────────────────
+// ── Master volume ──────────────────────────────────────────
 document.getElementById('masterVol').addEventListener('input', e => {
   state.masterVolume = parseFloat(e.target.value);
   document.getElementById('masterVolVal').textContent = state.masterVolume.toFixed(2);
   sendAll();
 });
 
-// ── Movement ───────────────────────────────────────────────
+// ── Linked toggle ──────────────────────────────────────────
+document.getElementById('linkedToggle').addEventListener('change', e => setLinkedMode(e.target.checked));
+
+// ── Note / Hz entry ────────────────────────────────────────
+const noteInputEl = document.getElementById('noteInput');
+const baseSaEl    = document.getElementById('baseSa');
+const noteErrEl   = document.getElementById('noteErr');
+
+function setSa(hz) {
+  state.baseSa = hz;
+  baseSaEl.value = hz.toFixed(3);
+  noteInputEl.value = hzToNote(hz);
+  document.getElementById('kattaiBadge').textContent = hzToKattai(hz);
+  noteErrEl.style.display = 'none';
+  if (state.linked) applyLinked();
+}
+
+noteInputEl.addEventListener('change', () => {
+  const hz = noteToHz(noteInputEl.value);
+  if (!hz) { noteErrEl.textContent = '? ' + noteInputEl.value; noteErrEl.style.display = ''; return; }
+  setSa(hz);
+});
+baseSaEl.addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (isNaN(v) || v <= 0) return;
+  state.baseSa = v;
+  noteInputEl.value = hzToNote(v);
+  document.getElementById('kattaiBadge').textContent = hzToKattai(v);
+  if (state.linked) applyLinked();
+});
+
+// ── Triangle ───────────────────────────────────────────────
+document.getElementById('triOn').addEventListener('change', e => {
+  state.triangle.on = e.target.checked; sendAll(); updateReadouts();
+});
+document.getElementById('triFreq').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (isNaN(v) || v <= 0) return;
+  state.triangle.freq = v;
+  document.getElementById('triFreqDisplay').textContent = fmtHz(v);
+  sendAll(); updateReadouts();
+});
+
+// ── Pulse 1 ────────────────────────────────────────────────
+document.getElementById('p1On').addEventListener('change', e => {
+  state.pulse1.on = e.target.checked; sendAll(); updateReadouts();
+});
+document.getElementById('p1Freq').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (isNaN(v) || v <= 0) return;
+  state.pulse1.freq = v;
+  document.getElementById('p1FreqDisplay').textContent = fmtHz(v);
+  sendAll(); updateReadouts();
+});
+document.getElementById('p1Vol').addEventListener('input', e => {
+  state.pulse1.vol = parseInt(e.target.value, 10);
+  document.getElementById('p1VolVal').textContent = state.pulse1.vol;
+  sendAll();
+});
+setupSwaraButtons('p1SwaraGrid', 1);
+setupDutyButtons('p1DutyBtns', state.pulse1, 1);
+
+// ── Pulse 2 ────────────────────────────────────────────────
+document.getElementById('p2On').addEventListener('change', e => {
+  state.pulse2.on = e.target.checked; sendAll(); updateReadouts();
+});
+document.getElementById('p2Freq').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (isNaN(v) || v <= 0) return;
+  state.pulse2.freq = v;
+  document.getElementById('p2FreqDisplay').textContent = fmtHz(v);
+  sendAll(); updateReadouts();
+});
+document.getElementById('p2Vol').addEventListener('input', e => {
+  state.pulse2.vol = parseInt(e.target.value, 10);
+  document.getElementById('p2VolVal').textContent = state.pulse2.vol;
+  sendAll();
+});
+document.getElementById('p2Detune').addEventListener('input', e => {
+  state.pulse2.detuneCents = parseFloat(e.target.value);
+  const v = state.pulse2.detuneCents;
+  document.getElementById('p2DetuneVal').textContent = (v >= 0 ? '+' : '') + v.toFixed(1) + '¢';
+  sendAll(); updateReadouts();
+});
+setupSwaraButtons('p2SwaraGrid', 2);
+setupDutyButtons('p2DutyBtns', state.pulse2, 2);
+
+// ── Movement & Vibrato ─────────────────────────────────────
 document.getElementById('driftDepth').addEventListener('input', e => {
   state.driftDepth = parseFloat(e.target.value);
-  document.getElementById('driftDepthVal').textContent = state.driftDepth.toFixed(1);
+  document.getElementById('driftDepthVal').textContent = state.driftDepth.toFixed(1) + '¢';
   sendAll();
 });
 document.getElementById('driftRate').addEventListener('input', e => {
@@ -710,11 +1085,9 @@ document.getElementById('swellRate').addEventListener('input', e => {
   document.getElementById('swellRateVal').textContent = state.swellRate.toFixed(2);
   sendAll();
 });
-
-// ── Vibrato ────────────────────────────────────────────────
 document.getElementById('vibDepth').addEventListener('input', e => {
   state.vibratoDepth = parseFloat(e.target.value);
-  document.getElementById('vibDepthVal').textContent = state.vibratoDepth.toFixed(1);
+  document.getElementById('vibDepthVal').textContent = state.vibratoDepth.toFixed(1) + '¢';
   sendAll();
 });
 document.getElementById('vibRate').addEventListener('input', e => {
@@ -723,125 +1096,40 @@ document.getElementById('vibRate').addEventListener('input', e => {
   sendAll();
 });
 
-// ── Linked toggle ──────────────────────────────────────────
-document.getElementById('linkedToggle').addEventListener('change', e => setLinkedMode(e.target.checked));
-
-// ── Note / Hz entry ────────────────────────────────────────
-const noteInputEl = document.getElementById('noteInput');
-const baseSaEl    = document.getElementById('baseSa');
-const noteErrEl   = document.getElementById('noteError');
-
-noteInputEl.addEventListener('change', () => {
-  const hz = noteToHz(noteInputEl.value);
-  if (!hz || hz < 10) { noteErrEl.style.display = 'block'; return; }
-  noteErrEl.style.display = 'none';
-  baseSaEl.value  = hz.toFixed(3);
-  state.baseSa    = hz;
-  if (state.linked) applyLinked();
-});
-
-baseSaEl.addEventListener('input', e => {
-  const v = parseFloat(e.target.value);
-  if (isNaN(v) || v <= 0) return;
-  state.baseSa = v;
-  noteInputEl.value = hzToNote(v);
-  noteErrEl.style.display = 'none';
-  document.getElementById('kattaiBadge').textContent = hzToKattai(v);
-  if (state.linked) applyLinked();
-});
-
-// ── Triangle ───────────────────────────────────────────────
-document.getElementById('triOn').addEventListener('change', e => {
-  state.triangle.on = e.target.checked; sendAll(); updateReadouts();
-});
-document.getElementById('triFreq').addEventListener('input', e => {
-  const v = parseFloat(e.target.value);
-  if (!isNaN(v) && v > 0) {
-    state.triangle.freq = v;
-    document.getElementById('triFreqDisplay').textContent = v.toFixed(3) + ' Hz';
-    sendAll(); updateReadouts();
-  }
-});
-
-// ── Pulse 1 ────────────────────────────────────────────────
-document.getElementById('p1On').addEventListener('change', e => {
-  state.pulse1.on = e.target.checked; sendAll(); updateReadouts();
-});
-document.getElementById('p1Freq').addEventListener('input', e => {
-  const v = parseFloat(e.target.value);
-  if (!isNaN(v) && v > 0) {
-    state.pulse1.freq = v;
-    document.getElementById('p1FreqDisplay').textContent = v.toFixed(3) + ' Hz';
-    sendAll(); updateReadouts();
-  }
-});
-document.getElementById('p1Vol').addEventListener('input', e => {
-  state.pulse1.vol = parseInt(e.target.value, 10);
-  document.getElementById('p1VolVal').textContent = state.pulse1.vol;
-  sendAll();
-});
-setupDutyButtons('p1DutyBtns', state.pulse1);
-setupSwaraButtons('p1SwaraBtns', 1);
-
-// ── Pulse 2 ────────────────────────────────────────────────
-document.getElementById('p2On').addEventListener('change', e => {
-  state.pulse2.on = e.target.checked; sendAll(); updateReadouts();
-});
-document.getElementById('p2Freq').addEventListener('input', e => {
-  const v = parseFloat(e.target.value);
-  if (!isNaN(v) && v > 0) {
-    state.pulse2.freq = v;
-    document.getElementById('p2FreqDisplay').textContent = v.toFixed(3) + ' Hz';
-    sendAll(); updateReadouts();
-  }
-});
-document.getElementById('p2Vol').addEventListener('input', e => {
-  state.pulse2.vol = parseInt(e.target.value, 10);
-  document.getElementById('p2VolVal').textContent = state.pulse2.vol;
-  sendAll();
-});
-document.getElementById('p2Detune').addEventListener('input', e => {
-  state.pulse2.detuneCents = parseFloat(e.target.value);
-  const v = state.pulse2.detuneCents;
-  document.getElementById('p2DetuneVal').textContent = (v >= 0 ? '+' : '') + v.toFixed(1);
-  sendAll(); updateReadouts();
-});
-setupDutyButtons('p2DutyBtns', state.pulse2);
-setupSwaraButtons('p2SwaraBtns', 2);
-
 // ── Presets ────────────────────────────────────────────────
-// Each preset defines: p1 swara, p2 swara, movement character
 const PRESETS = {
-  'sa-pa':         { p1: { ratio: 1,      name: 'Sa'  }, p2: { ratio: 1.5,    name: 'Pa'  }, driftDepth: 8,  driftRate: 0.13, swellDepth: 0.45, swellRate: 0.18 },
-  'sa-ma':         { p1: { ratio: 1,      name: 'Sa'  }, p2: { ratio: 1.3333, name: 'Ma'  }, driftDepth: 9,  driftRate: 0.11, swellDepth: 0.50, swellRate: 0.16 },
-  'sa-ni-komal':   { p1: { ratio: 1,      name: 'Sa'  }, p2: { ratio: 1.7778, name: 'Ni♭' }, driftDepth: 10, driftRate: 0.10, swellDepth: 0.50, swellRate: 0.15 },
-  'sa-ni-shuddha': { p1: { ratio: 1,      name: 'Sa'  }, p2: { ratio: 1.875,  name: 'Ni♮' }, driftDepth: 8,  driftRate: 0.12, swellDepth: 0.45, swellRate: 0.17 },
-  'pa-ma':         { p1: { ratio: 1.5,    name: 'Pa'  }, p2: { ratio: 1.3333, name: 'Ma'  }, driftDepth: 12, driftRate: 0.09, swellDepth: 0.55, swellRate: 0.14 },
-  'sa-sa':         { p1: { ratio: 1,      name: 'Sa'  }, p2: { ratio: 2.0,    name: 'Sa↑' }, driftDepth: 6,  driftRate: 0.15, swellDepth: 0.40, swellRate: 0.20 },
+  'sa-pa':         { p1: 'Sa',  p2: 'Pa',  driftDepth:  8, driftRate: 0.13, swellDepth: 0.45, swellRate: 0.18 },
+  'sa-ma':         { p1: 'Sa',  p2: 'Ma',  driftDepth:  9, driftRate: 0.11, swellDepth: 0.50, swellRate: 0.16 },
+  'sa-ni-komal':   { p1: 'Sa',  p2: 'Ni♭', driftDepth: 10, driftRate: 0.10, swellDepth: 0.50, swellRate: 0.15 },
+  'sa-ni-shuddha': { p1: 'Sa',  p2: 'Ni♮', driftDepth:  8, driftRate: 0.12, swellDepth: 0.45, swellRate: 0.17 },
+  'pa-ma':         { p1: 'Pa',  p2: 'Ma',  driftDepth: 12, driftRate: 0.09, swellDepth: 0.55, swellRate: 0.14 },
+  'sa-sa':         { p1: 'Sa',  p2: 'Sa↑', driftDepth:  6, driftRate: 0.15, swellDepth: 0.40, swellRate: 0.20 },
 };
+
+function applyPresetSwaraToGrid(gridId, name) {
+  document.getElementById(gridId).querySelectorAll('.sw-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.name === name);
+  });
+}
 
 function applyPreset(id) {
   const pr = PRESETS[id];
   if (!pr) return;
 
-  // Set swaras
-  [['p1SwaraBtns', 1, pr.p1], ['p2SwaraBtns', 2, pr.p2]].forEach(([btnId, n, sw]) => {
-    const ch = n === 1 ? state.pulse1 : state.pulse2;
-    ch.swaraRatio = sw.ratio;
-    ch.swaraName  = sw.name;
-    // Update button active state
-    document.getElementById(btnId).querySelectorAll('.swara-btn').forEach(btn => {
-      btn.classList.toggle('active', parseFloat(btn.dataset.ratio) === sw.ratio);
-    });
-  });
+  // Set swaras (match by name string — no float comparison)
+  state.pulse1.swaraName = pr.p1;
+  state.pulse2.swaraName = pr.p2;
+  applyPresetSwaraToGrid('p1SwaraGrid', pr.p1);
+  applyPresetSwaraToGrid('p2SwaraGrid', pr.p2);
 
   // Set movement
   state.driftDepth = pr.driftDepth;
   state.driftRate  = pr.driftRate;
   state.swellDepth = pr.swellDepth;
   state.swellRate  = pr.swellRate;
+
   document.getElementById('driftDepth').value = pr.driftDepth;
-  document.getElementById('driftDepthVal').textContent = pr.driftDepth.toFixed(1);
+  document.getElementById('driftDepthVal').textContent = pr.driftDepth.toFixed(1) + '¢';
   document.getElementById('driftRate').value = pr.driftRate;
   document.getElementById('driftRateVal').textContent = pr.driftRate.toFixed(2);
   document.getElementById('swellDepth').value = pr.swellDepth;
@@ -853,7 +1141,7 @@ function applyPreset(id) {
   else { updatePulseDisplay(1); updatePulseDisplay(2); sendAll(); updateReadouts(); }
 }
 
-document.getElementById('presetBtns').querySelectorAll('.preset-btn').forEach(btn => {
+document.querySelectorAll('.preset-btn').forEach(btn => {
   btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
 });
 
