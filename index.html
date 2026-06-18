@@ -401,6 +401,45 @@ details.mv-panel > summary:hover { color: var(--text); }
 .mv-section-label { font-size: 9px; color: var(--teal); letter-spacing: 2px; margin-bottom: 6px; }
 .hint-text { font-size: 9px; color: var(--dim); line-height: 1.6; margin-top: 4px; }
 
+/* ── Note slider ─────────────────────────────────────────── */
+.note-slider-bar {
+  padding: 8px 12px 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+.note-slider-label {
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+#noteSlider {
+  width: 100%;
+  accent-color: var(--teal);
+  height: 20px;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 3px;
+}
+.note-ticks {
+  position: relative;
+  height: 16px;
+  user-select: none;
+}
+.note-tick {
+  position: absolute;
+  font-size: 8px;
+  color: var(--dim);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.note-tick.natural { color: var(--text); }
+.note-tick.octave  { color: var(--teal); font-family: var(--pixel); font-size: 7px; }
+.note-tick.active  { color: var(--phosphor); text-shadow: 0 0 6px var(--phosphor); }
+
 /* ── Misc ────────────────────────────────────────────────── */
 input[type=number] {
   background: #0a0a1a; border: 1px solid var(--border);
@@ -456,6 +495,14 @@ input[type=number]:focus { border-color: var(--accent); }
       <span class="toggle-slider"></span>
     </label>
   </div>
+</div>
+
+<!-- ── Note Slider ────────────────────────────────────────── -->
+<div class="note-slider-bar">
+  <div class="note-slider-label">PITCH (C2 – F#4)</div>
+  <input type="range" id="noteSlider" min="36" max="66" step="1" value="50" list="noteMarks">
+  <datalist id="noteMarks"></datalist>
+  <div class="note-ticks" id="noteTicks"></div>
 </div>
 
 <!-- ── Presets ────────────────────────────────────────────── -->
@@ -866,6 +913,56 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 });
 
+// ── Note slider ────────────────────────────────────────────
+const SLIDER_MIN = 36, SLIDER_MAX = 66; // C2 to F#4
+const noteSliderEl = document.getElementById('noteSlider');
+const noteMarksEl  = document.getElementById('noteMarks');
+const noteTicksEl  = document.getElementById('noteTicks');
+
+const NATURAL_SEMI  = new Set([0, 2, 4, 5, 7, 9, 11]);
+const NOTE_LETTER   = {0:'C', 2:'D', 4:'E', 5:'F', 7:'G', 9:'A', 11:'B'};
+
+// Build datalist (native tick marks) and label row
+for (let m = SLIDER_MIN; m <= SLIDER_MAX; m++) {
+  const opt = document.createElement('option');
+  opt.value = m;
+  noteMarksEl.appendChild(opt);
+}
+const tickEls = {};
+for (let m = SLIDER_MIN; m <= SLIDER_MAX; m++) {
+  const semi = ((m % 12) + 12) % 12;
+  if (!NATURAL_SEMI.has(semi)) continue;
+  const pct = (m - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN) * 100;
+  const el  = document.createElement('span');
+  el.className = 'note-tick ' + (semi === 0 ? 'octave' : 'natural');
+  el.style.left = pct + '%';
+  el.textContent = semi === 0
+    ? NOTE_LETTER[semi] + (Math.floor(m / 12) - 1)
+    : NOTE_LETTER[semi];
+  noteTicksEl.appendChild(el);
+  tickEls[m] = el;
+}
+
+function syncNoteSlider(hz) {
+  if (!hz || hz <= 0 || !isFinite(hz)) return;
+  const midi    = Math.round(69 + 12 * Math.log2(hz / 440));
+  const clamped = Math.max(SLIDER_MIN, Math.min(SLIDER_MAX, midi));
+  noteSliderEl.value = clamped;
+  // Highlight the active tick
+  Object.entries(tickEls).forEach(([m, el]) => {
+    el.classList.toggle('active', parseInt(m, 10) === clamped);
+  });
+}
+
+noteSliderEl.addEventListener('input', e => {
+  const midi = parseInt(e.target.value, 10);
+  const hz   = 440 * Math.pow(2, (midi - 69) / 12);
+  setSa(hz);
+});
+
+// Initialise slider position to match default Sa
+syncNoteSlider(state.baseSa);
+
 // ── Linked: apply Sa to all channels ──────────────────────
 function applyLinked() {
   const sa = state.baseSa;
@@ -999,6 +1096,7 @@ function setSa(hz) {
   noteInputEl.value = hzToNote(hz);
   document.getElementById('kattaiBadge').textContent = hzToKattai(hz);
   noteErrEl.style.display = 'none';
+  syncNoteSlider(hz);
   if (state.linked) applyLinked();
 }
 
@@ -1014,6 +1112,7 @@ baseSaEl.addEventListener('change', e => {
   state.baseSa = v;
   noteInputEl.value = hzToNote(v);
   document.getElementById('kattaiBadge').textContent = hzToKattai(v);
+  syncNoteSlider(v);
   if (state.linked) applyLinked();
   else updateReadouts();
 });
