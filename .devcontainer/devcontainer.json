@@ -1,0 +1,19 @@
+{
+  "name": "NES Drone",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "NES Drone",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "postStartCommand": "python3 -m http.server 8080",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": false
+      }
+    }
+  }
+}
