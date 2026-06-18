@@ -5,15 +5,9 @@
   "portsAttributes": {
     "8080": {
       "label": "NES Drone",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "openBrowser",
+      "visibility": "public"
     }
   },
-  "postStartCommand": "python3 -m http.server 8080",
-  "customizations": {
-    "vscode": {
-      "settings": {
-        "editor.formatOnSave": false
-      }
-    }
-  }
+  "postAttachCommand": "python3 -m http.server 8080 --bind 0.0.0.0"
 }
