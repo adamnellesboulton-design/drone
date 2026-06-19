@@ -8,42 +8,42 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:      #080810;
-  --panel:   #0e0e20;
-  --border:  #252550;
-  --accent:  #4444ff;
-  --teal:    #00ddaa;
-  --orange:  #ff6633;
-  --yellow:  #ffaa22;
-  --green:   #33ff77;
-  --red:     #ff3333;
-  --dim:     #444466;
-  --text:    #bbbbdd;
-  --phosphor:#00ff66;
-  --font:    'Courier New', monospace;
-  --pixel:   'Press Start 2P', monospace;
+  --bg:      #000010;
+  --panel:   #00008A;
+  --border:  #FFFFFF;
+  --accent:  #FF2222;
+  --teal:    #00FFFF;
+  --orange:  #FF8800;
+  --yellow:  #FFFF00;
+  --green:   #00FF00;
+  --red:     #FF4444;
+  --dim:     #5555AA;
+  --text:    #FFFFFF;
+  --phosphor:#00FF00;
+  --font:    'Press Start 2P', monospace;
+  --mono:    'Courier New', monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font);
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
   min-height: 100vh;
   padding: 12px 14px 24px;
 }
 
 /* ── Typography ──────────────────────────────────────────── */
 h1 {
-  font-family: var(--pixel);
-  font-size: 13px;
-  color: var(--phosphor);
-  letter-spacing: 2px;
-  text-shadow: 0 0 12px var(--phosphor);
-  margin-bottom: 2px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--yellow);
+  letter-spacing: 3px;
+  text-shadow: 3px 3px 0 #883300;
+  margin-bottom: 4px;
 }
-.tagline { font-size: 9px; color: var(--dim); letter-spacing: 2px; margin-bottom: 10px; }
+.tagline { font-family: var(--font); font-size: 7px; color: var(--teal); letter-spacing: 2px; margin-bottom: 12px; }
 
 /* ── Oscilloscope ────────────────────────────────────────── */
 .scope-wrap {
@@ -51,21 +51,21 @@ h1 {
   width: 100%;
   height: 90px;
   margin-bottom: 10px;
-  border: 1px solid #1a1a3a;
-  border-radius: 2px;
+  border: 2px solid var(--border);
   overflow: hidden;
-  background: #020208;
+  background: #000000;
 }
 #scope { width: 100%; height: 100%; display: block; }
 .scope-label {
   position: absolute;
   top: 4px; left: 6px;
-  font-size: 8px;
-  color: #003322;
+  font-family: var(--font);
+  font-size: 7px;
+  color: #223322;
   letter-spacing: 2px;
   pointer-events: none;
 }
-.scope-label.live { color: #00aa44; }
+.scope-label.live { color: var(--green); text-shadow: 0 0 6px var(--green); }
 
 /* ── Transport bar ───────────────────────────────────────── */
 .transport {
@@ -75,38 +75,27 @@ h1 {
   flex-wrap: wrap;
   padding: 10px 12px;
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  border: 2px solid var(--border);
   margin-bottom: 8px;
 }
 
 .btn-start, .btn-stop {
-  font-family: var(--pixel);
-  font-size: 10px;
-  padding: 10px 16px;
-  border-radius: 2px;
+  font-family: var(--font);
+  font-size: 9px;
+  padding: 10px 14px;
   cursor: pointer;
-  border: 2px solid;
+  border: 2px solid var(--border);
   letter-spacing: 1px;
   white-space: nowrap;
-  transition: all 0.1s;
-  min-width: 110px;
+  min-width: 100px;
   text-align: center;
-}
-.btn-start {
-  background: #001a08;
-  border-color: var(--green);
+  background: #000000;
   color: var(--green);
-  text-shadow: 0 0 8px var(--green);
-  box-shadow: 0 0 10px #0a3a1a;
 }
-.btn-start:hover { background: #003310; box-shadow: 0 0 18px #0f5520; }
-.btn-stop {
-  background: #1a0008;
-  border-color: var(--red);
-  color: var(--red);
-}
-.btn-stop:hover { background: #2a000e; }
+.btn-start { text-shadow: 0 0 8px var(--green); }
+.btn-start:hover { background: #002200; }
+.btn-stop  { color: var(--red); }
+.btn-stop:hover  { background: #220000; }
 
 .sa-group {
   display: flex;
@@ -115,41 +104,39 @@ h1 {
   flex: 1;
   min-width: 260px;
 }
-.sa-group label { font-size: 9px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+.sa-group label { font-family: var(--font); font-size: 7px; color: var(--dim); letter-spacing: 2px; white-space: nowrap; }
 .sa-note {
   width: 56px;
-  font-family: var(--pixel);
-  font-size: 12px;
+  font-family: var(--font);
+  font-size: 10px;
   text-align: center;
-  background: #0a0a1a;
-  border: 1px solid var(--accent);
+  background: #000000;
+  border: 2px solid var(--teal);
   color: var(--teal);
   padding: 6px 4px;
-  border-radius: 2px;
   outline: none;
 }
-.sa-note:focus { box-shadow: 0 0 8px var(--accent); }
+.sa-note:focus { outline: 2px solid var(--yellow); }
 .sa-hz {
   width: 90px;
-  font-size: 12px;
-  background: #0a0a1a;
-  border: 1px solid var(--border);
+  font-size: 11px;
+  background: #000000;
+  border: 2px solid var(--border);
   color: var(--text);
-  padding: 6px 6px;
-  border-radius: 2px;
+  padding: 6px;
   outline: none;
-  font-family: var(--font);
+  font-family: var(--mono);
 }
-.sa-hz:focus { border-color: var(--accent); }
+.sa-hz:focus { border-color: var(--teal); }
 .kattai-badge {
-  font-size: 9px;
-  color: var(--dim);
-  border: 1px solid #252542;
-  padding: 3px 6px;
-  border-radius: 2px;
+  font-family: var(--font);
+  font-size: 7px;
+  color: var(--yellow);
+  border: 2px solid var(--yellow);
+  padding: 4px 6px;
   white-space: nowrap;
 }
-.note-err { font-size: 9px; color: var(--red); display: none; }
+.note-err { font-family: var(--font); font-size: 7px; color: var(--red); display: none; }
 
 .vol-group {
   display: flex;
@@ -157,30 +144,30 @@ h1 {
   gap: 6px;
   min-width: 140px;
 }
-.vol-group label { font-size: 9px; color: var(--dim); letter-spacing: 2px; }
+.vol-group label { font-family: var(--font); font-size: 7px; color: var(--dim); letter-spacing: 2px; }
 .vol-group input  { flex: 1; accent-color: var(--teal); }
-.vol-group span   { font-size: 11px; color: var(--teal); min-width: 32px; text-align: right; }
+.vol-group span   { font-family: var(--font); font-size: 8px; color: var(--teal); min-width: 36px; text-align: right; }
 
 .linked-group {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-.linked-group label { font-size: 9px; color: var(--dim); letter-spacing: 2px; }
+.linked-group label { font-family: var(--font); font-size: 7px; color: var(--dim); letter-spacing: 2px; }
 
 /* ── Toggle ──────────────────────────────────────────────── */
 .toggle { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
 .toggle input { display: none; }
 .toggle-slider {
-  position: absolute; inset: 0; background: #111122;
-  border-radius: 2px; cursor: pointer; border: 1px solid var(--border); transition: all 0.15s;
+  position: absolute; inset: 0; background: #000000;
+  border: 2px solid var(--border); cursor: pointer; transition: background 0.1s, border-color 0.1s;
 }
-.toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.toggle input:checked + .toggle-slider { background: var(--teal); border-color: var(--teal); }
 .toggle-slider::after {
-  content: ''; position: absolute; width: 14px; height: 12px;
-  left: 2px; top: 3px; background: #fff; border-radius: 1px; transition: transform 0.15s;
+  content: ''; position: absolute; width: 12px; height: 10px;
+  left: 2px; top: 3px; background: var(--border); transition: transform 0.1s;
 }
-.toggle input:checked + .toggle-slider::after { transform: translateX(18px); }
+.toggle input:checked + .toggle-slider::after { transform: translateX(18px); background: #000000; }
 
 /* ── Presets ─────────────────────────────────────────────── */
 .presets-bar {
@@ -190,27 +177,27 @@ h1 {
   margin-bottom: 10px;
   padding: 8px 10px;
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  border: 2px solid var(--border);
   align-items: center;
 }
-.presets-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; white-space: nowrap; margin-right: 4px; }
+.presets-label { font-family: var(--font); font-size: 7px; color: var(--dim); letter-spacing: 2px; white-space: nowrap; margin-right: 4px; }
 
 .preset-btn {
   font-family: var(--font);
-  font-size: 11px;
-  background: #111122;
-  border: 1px solid var(--border);
+  font-size: 7px;
+  background: #000000;
+  border: 2px solid var(--border);
   color: var(--text);
-  padding: 6px 10px;
-  border-radius: 2px;
+  padding: 7px 10px;
   cursor: pointer;
-  transition: all 0.1s;
-  line-height: 1.3;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+  line-height: 1.6;
 }
-.preset-btn:hover { border-color: var(--teal); color: var(--teal); background: #0a1a14; }
-.preset-btn b { display: block; font-size: 12px; margin-bottom: 1px; }
-.preset-btn span { font-size: 9px; color: var(--dim); }
+.preset-btn:hover { border-color: var(--yellow); color: var(--yellow); background: #111100; }
+.preset-btn.active { border-color: var(--yellow); color: #000000; background: var(--yellow); }
+.preset-btn b { display: block; font-size: 8px; margin-bottom: 2px; }
+.preset-btn span { font-family: var(--mono); font-size: 9px; color: var(--dim); }
+.preset-btn.active span { color: #444400; }
 
 /* ── Channel grid ────────────────────────────────────────── */
 .channels {
@@ -222,19 +209,18 @@ h1 {
 
 .channel {
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  overflow: hidden;
+  border: 2px solid var(--border);
 }
 .channel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  background: #000000;
 }
 .ch-name {
-  font-family: var(--pixel);
+  font-family: var(--font);
   font-size: 8px;
   letter-spacing: 1px;
 }
@@ -243,6 +229,7 @@ h1 {
 .ch-name.p2  { color: var(--yellow); }
 
 .ch-role {
+  font-family: var(--mono);
   font-size: 9px;
   color: var(--dim);
   margin-left: auto;
@@ -253,14 +240,13 @@ h1 {
 
 /* Frequency display */
 .freq-box {
-  background: #060612;
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  background: #000000;
+  border: 2px solid var(--border);
   padding: 8px 10px;
   margin-bottom: 8px;
 }
-.freq-big { font-size: 14px; color: var(--teal); letter-spacing: 1px; font-weight: bold; }
-.freq-sub { font-size: 9px; color: var(--dim); margin-top: 2px; }
+.freq-big { font-family: var(--font); font-size: 10px; color: var(--teal); }
+.freq-sub { font-family: var(--mono); font-size: 9px; color: var(--dim); margin-top: 4px; }
 
 /* Swara grid */
 .swara-grid {
@@ -270,70 +256,53 @@ h1 {
   margin-bottom: 8px;
 }
 .sw-btn {
-  background: #111122;
-  border: 1px solid var(--border);
+  background: #000000;
+  border: 2px solid var(--dim);
   color: var(--dim);
   font-family: var(--font);
-  font-size: 11px;
-  padding: 6px 2px;
-  border-radius: 2px;
+  font-size: 7px;
+  padding: 7px 2px;
   cursor: pointer;
   text-align: center;
-  transition: all 0.1s;
-  line-height: 1.3;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+  line-height: 1.5;
 }
-.sw-btn small { display: block; font-size: 8px; }
-.sw-btn:hover { border-color: var(--accent); color: var(--text); }
-.sw-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 6px var(--accent); }
+.sw-btn small { display: block; font-family: var(--mono); font-size: 8px; margin-top: 2px; }
+.sw-btn:hover { border-color: var(--text); color: var(--text); }
+.sw-btn.active { background: var(--teal); border-color: var(--teal); color: #000000; }
 
 /* Free-mode freq input */
 .free-freq {
   width: 100%;
-  background: #0a0a1a;
-  border: 1px solid var(--accent);
+  background: #000000;
+  border: 2px solid var(--teal);
   color: var(--text);
-  font-family: var(--font);
+  font-family: var(--mono);
   font-size: 13px;
   padding: 6px 8px;
-  border-radius: 2px;
   outline: none;
   margin-bottom: 8px;
   display: none;
 }
-.free-freq:focus { box-shadow: 0 0 6px var(--accent); }
+.free-freq:focus { border-color: var(--yellow); }
 
-/* Per-channel advanced controls inside <details> */
-details.ch-adv { margin-top: 8px; }
-details.ch-adv > summary {
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 2px;
-  cursor: pointer;
-  padding: 4px 0;
-  list-style: none;
-  user-select: none;
-}
-details.ch-adv > summary::before { content: '▶ '; }
-details.ch-adv[open] > summary::before { content: '▼ '; }
-details.ch-adv > summary:hover { color: var(--text); }
 
 /* Duty buttons */
 .duty-row { display: flex; gap: 4px; margin-bottom: 8px; }
 .duty-btn {
   flex: 1;
-  background: #111122;
-  border: 1px solid var(--border);
+  background: #000000;
+  border: 2px solid var(--dim);
   color: var(--dim);
   font-family: var(--font);
-  font-size: 10px;
-  padding: 5px 2px;
-  border-radius: 2px;
+  font-size: 7px;
+  padding: 6px 2px;
   cursor: pointer;
   text-align: center;
-  transition: all 0.1s;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
 }
-.duty-btn:hover { border-color: var(--accent); }
-.duty-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.duty-btn:hover { border-color: var(--text); color: var(--text); }
+.duty-btn.active { background: var(--orange); border-color: var(--orange); color: #000000; }
 
 /* Sliders and labels */
 .ctrl-row {
@@ -343,22 +312,22 @@ details.ch-adv > summary:hover { color: var(--text); }
   margin-bottom: 6px;
 }
 .ctrl-row label {
-  font-size: 9px;
+  font-family: var(--font);
+  font-size: 7px;
   color: var(--dim);
   letter-spacing: 1px;
-  text-transform: uppercase;
   white-space: nowrap;
-  min-width: 50px;
+  min-width: 52px;
 }
-.ctrl-row input[type=range] { flex: 1; accent-color: var(--accent); height: 16px; cursor: pointer; }
-.ctrl-val { font-size: 11px; color: var(--teal); min-width: 36px; text-align: right; }
+.ctrl-row input[type=range] { flex: 1; accent-color: var(--yellow); height: 16px; cursor: pointer; }
+.ctrl-val { font-family: var(--font); font-size: 8px; color: var(--teal); min-width: 36px; text-align: right; }
 
 /* Readout */
 .readout {
-  background: #040410;
-  border: 1px solid #1a1a35;
-  border-radius: 2px;
+  background: #000000;
+  border: 2px solid var(--border);
   padding: 6px 8px;
+  font-family: var(--mono);
   font-size: 10px;
   line-height: 1.9;
 }
@@ -371,14 +340,14 @@ details.ch-adv > summary:hover { color: var(--text); }
 /* ── Movement & Vibrato panel ────────────────────────────── */
 details.mv-panel {
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  border: 2px solid var(--border);
   padding: 0;
   margin-bottom: 8px;
 }
 details.mv-panel > summary {
   padding: 10px 12px;
-  font-size: 9px;
+  font-family: var(--font);
+  font-size: 7px;
   color: var(--dim);
   letter-spacing: 2px;
   cursor: pointer;
@@ -388,7 +357,7 @@ details.mv-panel > summary {
   gap: 8px;
   user-select: none;
 }
-details.mv-panel > summary::before { content: '▶'; font-size: 8px; }
+details.mv-panel > summary::before { content: '▶'; font-size: 8px; margin-right: 4px; }
 details.mv-panel[open] > summary::before { content: '▼'; }
 details.mv-panel > summary:hover { color: var(--text); }
 .mv-body {
@@ -396,32 +365,32 @@ details.mv-panel > summary:hover { color: var(--text); }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px 24px;
-  border-top: 1px solid var(--border);
+  border-top: 2px solid var(--border);
 }
-.mv-section-label { font-size: 9px; color: var(--teal); letter-spacing: 2px; margin-bottom: 6px; }
-.hint-text { font-size: 9px; color: var(--dim); line-height: 1.6; margin-top: 4px; }
+.mv-section-label { font-family: var(--font); font-size: 7px; color: var(--teal); letter-spacing: 2px; margin-bottom: 6px; }
+.hint-text { font-family: var(--mono); font-size: 9px; color: var(--dim); line-height: 1.6; margin-top: 4px; }
 
 /* ── Note slider ─────────────────────────────────────────── */
 .note-slider-bar {
   padding: 8px 12px 6px;
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  border: 2px solid var(--border);
   margin-bottom: 8px;
 }
 .note-slider-label {
-  font-size: 9px;
+  font-family: var(--font);
+  font-size: 7px;
   color: var(--dim);
   letter-spacing: 2px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 #noteSlider {
   width: 100%;
-  accent-color: var(--teal);
+  accent-color: var(--yellow);
   height: 20px;
   cursor: pointer;
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .note-ticks {
   position: relative;
@@ -430,25 +399,26 @@ details.mv-panel > summary:hover { color: var(--text); }
 }
 .note-tick {
   position: absolute;
-  font-size: 8px;
+  font-family: var(--font);
+  font-size: 6px;
   color: var(--dim);
   transform: translateX(-50%);
   white-space: nowrap;
   pointer-events: none;
 }
 .note-tick.natural { color: var(--text); }
-.note-tick.octave  { color: var(--teal); font-family: var(--pixel); font-size: 7px; }
-.note-tick.active  { color: var(--phosphor); text-shadow: 0 0 6px var(--phosphor); }
+.note-tick.octave  { color: var(--yellow); }
+.note-tick.active  { color: var(--green); text-shadow: 0 0 6px var(--green); }
 
 /* ── Misc ────────────────────────────────────────────────── */
 input[type=number] {
-  background: #0a0a1a; border: 1px solid var(--border);
-  color: var(--text); font-family: var(--font); font-size: 12px;
-  padding: 4px 6px; border-radius: 2px; outline: none;
+  background: #000000; border: 2px solid var(--border);
+  color: var(--text); font-family: var(--mono); font-size: 12px;
+  padding: 4px 6px; outline: none;
 }
-input[type=number]:focus { border-color: var(--accent); }
+input[type=number]:focus { border-color: var(--teal); }
 
-.sep { height: 1px; background: var(--border); margin: 8px 0; }
+.sep { height: 2px; background: var(--border); margin: 8px 0; opacity: 0.3; }
 
 @media (max-width: 720px) {
   .channels { grid-template-columns: 1fr; }
@@ -461,7 +431,7 @@ input[type=number]:focus { border-color: var(--accent); }
 
 <!-- ── Header ─────────────────────────────────────────────── -->
 <h1>▶ NES DRONE</h1>
-<p class="tagline">NTSC 2A03 · TANPURA REHEARSAL · SA–PA / SA–MA / SA–NI</p>
+<p class="tagline">NTSC 2A03 · TANPURA REHEARSAL · 3-CHANNEL DRONE</p>
 
 <!-- ── Oscilloscope ───────────────────────────────────────── -->
 <div class="scope-wrap">
@@ -550,18 +520,12 @@ input[type=number]:focus { border-color: var(--accent); }
       <!-- Free-mode input -->
       <input type="number" class="free-freq" id="triFreq" value="73.415" step="0.001" min="0.01">
 
-      <details class="ch-adv">
-        <summary>NES READOUT</summary>
-        <div style="margin-top:6px">
-          <div class="readout">
-            <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="triPeriod">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="triActual">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="triCents">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="triMuted">—</span></div>
-          </div>
-          <p class="hint-text" style="margin-top:6px">Muted when t&lt;2 · Lowest ≈27.3 Hz (t=2047) · No volume control on hardware</p>
-        </div>
-      </details>
+      <div class="readout">
+        <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="triPeriod">—</span></div>
+        <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="triActual">—</span></div>
+        <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="triCents">—</span></div>
+        <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="triMuted">—</span></div>
+      </div>
     </div>
   </div>
 
@@ -594,30 +558,26 @@ input[type=number]:focus { border-color: var(--accent); }
       <!-- Free-mode input -->
       <input type="number" class="free-freq" id="p1Freq" value="146.83" step="0.001" min="0.01">
 
-      <details class="ch-adv">
-        <summary>TIMBRE &amp; TUNING</summary>
-        <div style="margin-top:8px">
-          <div style="font-size:9px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">DUTY CYCLE</div>
-          <div class="duty-row" id="p1DutyBtns">
-            <button class="duty-btn"        data-duty="0.125">12.5%</button>
-            <button class="duty-btn active" data-duty="0.25" >25%</button>
-            <button class="duty-btn"        data-duty="0.5"  >50%</button>
-          </div>
-          <div class="ctrl-row">
-            <label>VOL</label>
-            <input type="range" id="p1Vol" min="0" max="15" step="1" value="13">
-            <span class="ctrl-val" id="p1VolVal">13</span>
-          </div>
-          <div class="sep"></div>
-          <div class="readout">
-            <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="p1Period">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="p1Actual">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="p1Cents">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="p1Muted">—</span></div>
-          </div>
-          <p class="hint-text" style="margin-top:6px">Muted when t&lt;8 · Lowest ≈54.6 Hz (t=2047)</p>
+      <div style="margin-top:8px">
+        <div style="font-family:var(--font);font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">DUTY</div>
+        <div class="duty-row" id="p1DutyBtns">
+          <button class="duty-btn"        data-duty="0.125">12.5%</button>
+          <button class="duty-btn active" data-duty="0.25" >25%</button>
+          <button class="duty-btn"        data-duty="0.5"  >50%</button>
         </div>
-      </details>
+        <div class="ctrl-row">
+          <label>VOL</label>
+          <input type="range" id="p1Vol" min="0" max="15" step="1" value="13">
+          <span class="ctrl-val" id="p1VolVal">13</span>
+        </div>
+        <div class="sep"></div>
+        <div class="readout">
+          <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="p1Period">—</span></div>
+          <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="p1Actual">—</span></div>
+          <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="p1Cents">—</span></div>
+          <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="p1Muted">—</span></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -650,44 +610,41 @@ input[type=number]:focus { border-color: var(--accent); }
       <!-- Free-mode input -->
       <input type="number" class="free-freq" id="p2Freq" value="220.245" step="0.001" min="0.01">
 
-      <details class="ch-adv">
-        <summary>TIMBRE &amp; TUNING</summary>
-        <div style="margin-top:8px">
-          <div style="font-size:9px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">DUTY CYCLE</div>
-          <div class="duty-row" id="p2DutyBtns">
-            <button class="duty-btn"        data-duty="0.125">12.5%</button>
-            <button class="duty-btn active" data-duty="0.25" >25%</button>
-            <button class="duty-btn"        data-duty="0.5"  >50%</button>
-          </div>
-          <div class="ctrl-row">
-            <label>VOL</label>
-            <input type="range" id="p2Vol" min="0" max="15" step="1" value="10">
-            <span class="ctrl-val" id="p2VolVal">10</span>
-          </div>
-          <div class="ctrl-row">
-            <label>SHIMMER</label>
-            <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="7">
-            <span class="ctrl-val" id="p2DetuneVal">+7¢</span>
-          </div>
-          <p class="hint-text">Detune shifts target before period snap — beats against String 1 for shimmer.</p>
-          <div class="sep"></div>
-          <div class="readout">
-            <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="p2Period">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="p2Actual">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="p2Cents">—</span></div>
-            <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="p2Muted">—</span></div>
-          </div>
-          <p class="hint-text" style="margin-top:6px">Muted when t&lt;8 · Lowest ≈54.6 Hz (t=2047)</p>
+      <div style="margin-top:8px">
+        <div style="font-family:var(--font);font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">DUTY</div>
+        <div class="duty-row" id="p2DutyBtns">
+          <button class="duty-btn"        data-duty="0.125">12.5%</button>
+          <button class="duty-btn active" data-duty="0.25" >25%</button>
+          <button class="duty-btn"        data-duty="0.5"  >50%</button>
         </div>
-      </details>
+        <div class="ctrl-row">
+          <label>VOL</label>
+          <input type="range" id="p2Vol" min="0" max="15" step="1" value="10">
+          <span class="ctrl-val" id="p2VolVal">10</span>
+        </div>
+        <div class="ctrl-row">
+          <label>SHIMMER</label>
+          <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="7">
+          <span class="ctrl-val" id="p2DetuneVal">+7¢</span>
+        </div>
+        <div class="sep"></div>
+        <div class="readout">
+          <div class="ro-row"><span class="ro-lbl">Period t</span><span class="ro-val" id="p2Period">—</span></div>
+          <div class="ro-row"><span class="ro-lbl">Actual Hz</span><span class="ro-val" id="p2Actual">—</span></div>
+          <div class="ro-row"><span class="ro-lbl">Error</span><span class="ro-val" id="p2Cents">—</span></div>
+          <div class="ro-row"><span class="ro-lbl">Status</span><span class="ro-val" id="p2Muted">—</span></div>
+        </div>
+      </div>
     </div>
   </div>
 
 </div><!-- .channels -->
 
 <!-- ── Movement & Vibrato ──────────────────────────────────── -->
-<details class="mv-panel">
-  <summary>MOVEMENT &amp; VIBRATO <span style="font-size:9px;color:var(--dim);margin-left:8px">(software simulation — not NES hardware)</span></summary>
+<div class="mv-panel">
+  <div style="padding:10px 12px 6px;font-family:var(--font);font-size:7px;color:var(--dim);letter-spacing:2px;border-bottom:2px solid var(--border)">
+    MOVEMENT &amp; VIBRATO <span style="color:#333366;margin-left:8px">— SOFTWARE SIM</span>
+  </div>
   <div class="mv-body">
     <div>
       <div class="mv-section-label">DRONE DRIFT</div>
@@ -728,7 +685,7 @@ input[type=number]:focus { border-color: var(--accent); }
       <p class="hint-text">Smooth LFO — real NES vibrato would step between integer period values at the 60 Hz frame rate.</p>
     </div>
   </div>
-</details>
+</div>
 
 <script>
 // ── NES constants & helpers ────────────────────────────────
@@ -1258,7 +1215,11 @@ function applyPreset(id) {
 }
 
 document.querySelectorAll('.preset-btn').forEach(btn => {
-  btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyPreset(btn.dataset.preset);
+  });
 });
 
 // ── Init ───────────────────────────────────────────────────
