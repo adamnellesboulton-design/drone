@@ -8,8 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:      #000010;
-  --panel:   #00008A;
+  --bg:      #0000AA;
+  --panel:   #000000;
   --border:  #FFFFFF;
   --accent:  #FF2222;
   --teal:    #00FFFF;
@@ -17,7 +17,7 @@
   --yellow:  #FFFF00;
   --green:   #00FF00;
   --red:     #FF4444;
-  --dim:     #5555AA;
+  --dim:     #8888CC;
   --text:    #FFFFFF;
   --phosphor:#00FF00;
   --font:    'Press Start 2P', monospace;
@@ -38,12 +38,11 @@ body {
 h1 {
   font-family: var(--font);
   font-size: 14px;
-  color: var(--yellow);
+  color: var(--text);
   letter-spacing: 3px;
-  text-shadow: 3px 3px 0 #883300;
   margin-bottom: 4px;
 }
-.tagline { font-family: var(--font); font-size: 7px; color: var(--teal); letter-spacing: 2px; margin-bottom: 12px; }
+.tagline { font-family: var(--font); font-size: 7px; color: var(--dim); letter-spacing: 2px; margin-bottom: 12px; }
 
 /* ── Oscilloscope ────────────────────────────────────────── */
 .scope-wrap {
@@ -61,7 +60,7 @@ h1 {
   top: 4px; left: 6px;
   font-family: var(--font);
   font-size: 7px;
-  color: #223322;
+  color: #114411;
   letter-spacing: 2px;
   pointer-events: none;
 }
@@ -76,7 +75,7 @@ h1 {
   padding: 10px 12px;
   background: var(--panel);
   border: 2px solid var(--border);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .btn-start, .btn-stop {
@@ -215,9 +214,9 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
-  border-bottom: 2px solid var(--border);
-  background: #000000;
+  padding: 6px 10px;
+  background: var(--bg);
+  border-bottom: none;
 }
 .ch-name {
   font-family: var(--font);
@@ -338,28 +337,12 @@ h1 {
 .ro-val.warn { color: var(--red); }
 
 /* ── Movement & Vibrato panel ────────────────────────────── */
-details.mv-panel {
+.mv-panel {
   background: var(--panel);
   border: 2px solid var(--border);
   padding: 0;
   margin-bottom: 8px;
 }
-details.mv-panel > summary {
-  padding: 10px 12px;
-  font-family: var(--font);
-  font-size: 7px;
-  color: var(--dim);
-  letter-spacing: 2px;
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  user-select: none;
-}
-details.mv-panel > summary::before { content: '▶'; font-size: 8px; margin-right: 4px; }
-details.mv-panel[open] > summary::before { content: '▼'; }
-details.mv-panel > summary:hover { color: var(--text); }
 .mv-body {
   padding: 10px 12px 12px;
   display: grid;
@@ -642,8 +625,8 @@ input[type=number]:focus { border-color: var(--teal); }
 
 <!-- ── Movement & Vibrato ──────────────────────────────────── -->
 <div class="mv-panel">
-  <div style="padding:10px 12px 6px;font-family:var(--font);font-size:7px;color:var(--dim);letter-spacing:2px;border-bottom:2px solid var(--border)">
-    MOVEMENT &amp; VIBRATO <span style="color:#333366;margin-left:8px">— SOFTWARE SIM</span>
+  <div style="padding:6px 12px;font-family:var(--font);font-size:7px;color:var(--text);letter-spacing:2px;background:var(--bg);border-bottom:2px solid var(--border)">
+    MOVEMENT &amp; VIBRATO <span style="color:var(--dim);margin-left:8px">— SOFTWARE SIM</span>
   </div>
   <div class="mv-body">
     <div>
