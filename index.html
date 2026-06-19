@@ -624,7 +624,7 @@ input[type=number]:focus { border-color: var(--teal); }
         </div>
         <div class="ctrl-row">
           <label>SHIMMER</label>
-          <input type="range" id="p2Detune" min="-25" max="25" step="0.5" value="7">
+          <input type="range" id="p2Detune" min="-12" max="12" step="0.5" value="7">
           <span class="ctrl-val" id="p2DetuneVal">+7¢</span>
         </div>
         <div class="sep"></div>
@@ -650,22 +650,22 @@ input[type=number]:focus { border-color: var(--teal); }
       <div class="mv-section-label">DRONE DRIFT</div>
       <div class="ctrl-row">
         <label>DEPTH</label>
-        <input type="range" id="driftDepth" min="0" max="30" step="0.5" value="8">
+        <input type="range" id="driftDepth" min="0" max="18" step="0.5" value="8">
         <span class="ctrl-val" id="driftDepthVal">8¢</span>
       </div>
       <div class="ctrl-row">
         <label>SPEED</label>
-        <input type="range" id="driftRate" min="0.04" max="0.5" step="0.01" value="0.13">
+        <input type="range" id="driftRate" min="0.05" max="0.25" step="0.01" value="0.13">
         <span class="ctrl-val" id="driftRateVal">0.13</span>
       </div>
       <div class="ctrl-row">
         <label>SWELL</label>
-        <input type="range" id="swellDepth" min="0" max="1" step="0.01" value="0.45">
+        <input type="range" id="swellDepth" min="0" max="0.7" step="0.01" value="0.45">
         <span class="ctrl-val" id="swellDepthVal">45%</span>
       </div>
       <div class="ctrl-row">
         <label>SW SPD</label>
-        <input type="range" id="swellRate" min="0.05" max="0.5" step="0.01" value="0.18">
+        <input type="range" id="swellRate" min="0.05" max="0.25" step="0.01" value="0.18">
         <span class="ctrl-val" id="swellRateVal">0.18</span>
       </div>
       <p class="hint-text">3-partial LFO per channel at offset rates (×0.93/1.0/×1.07) — channels cross in and out of phase over ~55s cycles. Pulse vol steps through 4-bit NES levels (0–15).</p>
@@ -674,12 +674,12 @@ input[type=number]:focus { border-color: var(--teal); }
       <div class="mv-section-label">VIBRATO</div>
       <div class="ctrl-row">
         <label>DEPTH</label>
-        <input type="range" id="vibDepth" min="0" max="20" step="0.5" value="0">
+        <input type="range" id="vibDepth" min="0" max="10" step="0.5" value="0">
         <span class="ctrl-val" id="vibDepthVal">0¢</span>
       </div>
       <div class="ctrl-row">
         <label>RATE</label>
-        <input type="range" id="vibRate" min="0.5" max="12" step="0.1" value="5">
+        <input type="range" id="vibRate" min="3" max="8" step="0.1" value="5">
         <span class="ctrl-val" id="vibRateVal">5.0</span>
       </div>
       <p class="hint-text">Smooth LFO — real NES vibrato would step between integer period values at the 60 Hz frame rate.</p>
