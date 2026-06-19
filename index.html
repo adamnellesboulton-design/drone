@@ -96,20 +96,16 @@ h1 {
 .btn-stop  { color: var(--red); }
 .btn-stop:hover  { background: #220000; }
 
-.btn-fatten {
-  font-family: var(--font);
-  font-size: 9px;
-  padding: 10px 14px;
-  cursor: pointer;
-  border: 2px solid var(--dim);
+
+.btn-domain {
+  font-family: var(--font); font-size: 7px; padding: 4px 8px;
+  cursor: pointer; border: 1px solid var(--dim);
+  background: #000000; color: var(--dim);
   letter-spacing: 1px;
-  white-space: nowrap;
-  background: #000000;
-  color: var(--dim);
   transition: border-color 0.1s, color 0.1s, background 0.1s;
 }
-.btn-fatten:hover { border-color: var(--orange); color: var(--orange); }
-.btn-fatten.active { background: var(--orange); border-color: var(--orange); color: #000000; }
+.btn-domain:hover { border-color: var(--teal); color: var(--teal); }
+.btn-domain.active { background: var(--teal); border-color: var(--teal); color: #000000; }
 
 .sa-group {
   display: flex;
@@ -464,7 +460,7 @@ input[type=number]:focus { border-color: var(--teal); }
     </label>
   </div>
 
-  <button class="btn-fatten" id="fattenBtn">◈ FATTEN</button>
+
 </div>
 
 <!-- ── Note Slider ────────────────────────────────────────── -->
@@ -624,7 +620,7 @@ input[type=number]:focus { border-color: var(--teal); }
         </div>
         <div class="ctrl-row">
           <label>SHIMMER</label>
-          <input type="range" id="p2Detune" min="-12" max="12" step="0.5" value="7">
+          <input type="range" id="p2Detune" min="-8" max="10" step="0.5" value="7">
           <span class="ctrl-val" id="p2DetuneVal">+7¢</span>
         </div>
         <div class="sep"></div>
@@ -642,30 +638,31 @@ input[type=number]:focus { border-color: var(--teal); }
 
 <!-- ── Movement & Vibrato ──────────────────────────────────── -->
 <div class="mv-panel">
-  <div style="padding:6px 12px;font-family:var(--font);font-size:7px;color:var(--text);letter-spacing:2px;background:var(--bg);border-bottom:2px solid var(--border)">
-    MOVEMENT &amp; VIBRATO <span style="color:var(--dim);margin-left:8px">— SOFTWARE SIM</span>
+  <div style="padding:6px 12px;font-family:var(--font);font-size:7px;color:var(--text);letter-spacing:2px;background:var(--bg);border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+    <span>MOVEMENT &amp; VIBRATO <span style="color:var(--dim);margin-left:8px">— SOFTWARE SIM</span></span>
+    <button class="btn-domain" id="domainBtn">WIDE</button>
   </div>
   <div class="mv-body">
     <div>
       <div class="mv-section-label">DRONE DRIFT</div>
       <div class="ctrl-row">
         <label>DEPTH</label>
-        <input type="range" id="driftDepth" min="0" max="18" step="0.5" value="8">
+        <input type="range" id="driftDepth" min="0" max="12" step="0.5" value="8">
         <span class="ctrl-val" id="driftDepthVal">8¢</span>
       </div>
       <div class="ctrl-row">
         <label>SPEED</label>
-        <input type="range" id="driftRate" min="0.05" max="0.25" step="0.01" value="0.13">
+        <input type="range" id="driftRate" min="0.08" max="0.20" step="0.01" value="0.13">
         <span class="ctrl-val" id="driftRateVal">0.13</span>
       </div>
       <div class="ctrl-row">
         <label>SWELL</label>
-        <input type="range" id="swellDepth" min="0" max="0.7" step="0.01" value="0.45">
+        <input type="range" id="swellDepth" min="0.2" max="0.65" step="0.01" value="0.45">
         <span class="ctrl-val" id="swellDepthVal">45%</span>
       </div>
       <div class="ctrl-row">
         <label>SW SPD</label>
-        <input type="range" id="swellRate" min="0.05" max="0.25" step="0.01" value="0.18">
+        <input type="range" id="swellRate" min="0.08" max="0.20" step="0.01" value="0.18">
         <span class="ctrl-val" id="swellRateVal">0.18</span>
       </div>
       <p class="hint-text">3-partial LFO per channel at offset rates (×0.93/1.0/×1.07) — channels cross in and out of phase over ~55s cycles. Pulse vol steps through 4-bit NES levels (0–15).</p>
@@ -674,12 +671,12 @@ input[type=number]:focus { border-color: var(--teal); }
       <div class="mv-section-label">VIBRATO</div>
       <div class="ctrl-row">
         <label>DEPTH</label>
-        <input type="range" id="vibDepth" min="0" max="10" step="0.5" value="0">
+        <input type="range" id="vibDepth" min="0" max="6" step="0.5" value="0">
         <span class="ctrl-val" id="vibDepthVal">0¢</span>
       </div>
       <div class="ctrl-row">
         <label>RATE</label>
-        <input type="range" id="vibRate" min="3" max="8" step="0.1" value="5">
+        <input type="range" id="vibRate" min="4" max="7" step="0.1" value="5">
         <span class="ctrl-val" id="vibRateVal">5.0</span>
       </div>
       <p class="hint-text">Smooth LFO — real NES vibrato would step between integer period values at the 60 Hz frame rate.</p>
@@ -761,26 +758,6 @@ const state = {
 
 // ── Audio ──────────────────────────────────────────────────
 let audioCtx = null, workletNode = null, analyser = null;
-let waveShaper = null, fatSplitter = null, fatMerger = null, fatDelay = null;
-let fattenOn = false;
-
-// Tanh saturation curve — precomputed, reused across audio sessions
-const FAT_CURVE = (() => {
-  const n = 512, k = 4;
-  const c = new Float32Array(n);
-  const norm = Math.tanh(k);
-  for (let i = 0; i < n; i++) {
-    c[i] = Math.tanh(k * ((i * 2) / n - 1)) / norm;
-  }
-  return c;
-})();
-
-function setFatten(on) {
-  fattenOn = on;
-  if (waveShaper) waveShaper.curve = on ? FAT_CURVE : null;
-  if (fatDelay)   fatDelay.delayTime.value = on ? 0.015 : 0; // 15ms Haas stereo width
-  document.getElementById('fattenBtn').classList.toggle('active', on);
-}
 
 async function startAudio() {
   if (audioCtx) {
@@ -798,22 +775,8 @@ async function startAudio() {
   analyser.fftSize = 2048;
   analyser.smoothingTimeConstant = 0.3;
 
-  // Fatten chain: saturation → stereo splitter → [direct L, delay R] → merger
-  waveShaper  = audioCtx.createWaveShaper();
-  waveShaper.oversample = '4x';
-  fatSplitter = audioCtx.createChannelSplitter(2);
-  fatMerger   = audioCtx.createChannelMerger(2);
-  fatDelay    = audioCtx.createDelay(0.1);
-
   workletNode.connect(analyser);
-  analyser.connect(waveShaper);
-  waveShaper.connect(fatSplitter);
-  fatSplitter.connect(fatMerger, 0, 0);   // L: direct
-  fatSplitter.connect(fatDelay,  0);       // R: through delay
-  fatDelay.connect(fatMerger, 0, 1);
-  fatMerger.connect(audioCtx.destination);
-
-  setFatten(fattenOn); // apply current toggle state immediately
+  analyser.connect(audioCtx.destination);
   if (audioCtx.state === 'suspended') await audioCtx.resume();
   sendAll();
 }
@@ -838,10 +801,6 @@ function sendAll() {
 function stopAudio() {
   if (workletNode) { workletNode.disconnect(); workletNode = null; }
   if (analyser)    { analyser.disconnect();    analyser    = null; }
-  if (waveShaper)  { waveShaper.disconnect();  waveShaper  = null; }
-  if (fatSplitter) { fatSplitter.disconnect(); fatSplitter = null; }
-  if (fatMerger)   { fatMerger.disconnect();   fatMerger   = null; }
-  if (fatDelay)    { fatDelay.disconnect();    fatDelay    = null; }
   if (audioCtx)    { audioCtx.close();         audioCtx    = null; }
 }
 
@@ -1065,7 +1024,50 @@ document.getElementById('startBtn').addEventListener('click', async () => {
   scopeLabel.className   = 'scope-label live';
   updateReadouts();
 });
-document.getElementById('fattenBtn').addEventListener('click', () => setFatten(!fattenOn));
+
+// ── Domain (range) toggle ──────────────────────────────────
+const DOMAIN = {
+  tight: {
+    driftDepth: { min: 0,    max: 12,   step: 0.5  },
+    driftRate:  { min: 0.08, max: 0.20, step: 0.01 },
+    swellDepth: { min: 0.2,  max: 0.65, step: 0.01 },
+    swellRate:  { min: 0.08, max: 0.20, step: 0.01 },
+    vibDepth:   { min: 0,    max: 6,    step: 0.5  },
+    vibRate:    { min: 4,    max: 7,    step: 0.1  },
+    p2Detune:   { min: -8,   max: 10,   step: 0.5  },
+  },
+  wide: {
+    driftDepth: { min: 0,    max: 18,   step: 0.5  },
+    driftRate:  { min: 0.05, max: 0.25, step: 0.01 },
+    swellDepth: { min: 0,    max: 0.7,  step: 0.01 },
+    swellRate:  { min: 0.05, max: 0.25, step: 0.01 },
+    vibDepth:   { min: 0,    max: 10,   step: 0.5  },
+    vibRate:    { min: 3,    max: 8,    step: 0.1  },
+    p2Detune:   { min: -12,  max: 12,   step: 0.5  },
+  },
+};
+let domainWide = false;
+function setDomain(wide) {
+  domainWide = wide;
+  const cfg = wide ? DOMAIN.wide : DOMAIN.tight;
+  Object.entries(cfg).forEach(([id, { min, max, step }]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.min  = min;
+    el.max  = max;
+    el.step = step;
+    // Clamp current value within new range
+    const v = parseFloat(el.value);
+    if (v < min) { el.value = min; el.dispatchEvent(new Event('input')); }
+    if (v > max) { el.value = max; el.dispatchEvent(new Event('input')); }
+  });
+  const btn = document.getElementById('domainBtn');
+  btn.classList.toggle('active', wide);
+  btn.textContent = wide ? 'TIGHT' : 'WIDE';
+}
+document.getElementById('domainBtn').addEventListener('click', () => setDomain(!domainWide));
+// Boot in tight mode
+setDomain(false);
 document.getElementById('stopBtn').addEventListener('click', () => {
   stopAudio();
   document.getElementById('startBtn').style.display = '';
