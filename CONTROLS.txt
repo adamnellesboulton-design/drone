@@ -1,0 +1,92 @@
+NES DRONE — CONTROLS REFERENCE
+================================
+
+
+SA (note / Hz)
+The root pitch in Hz — cycles per second. 440 Hz is A4, the standard tuning
+reference. Doubling the Hz goes up an octave; halving goes down one. Abbas sets
+this to match his tabla tuning.
+
+KATTAI
+A South Indian classical numbering system for pitch. C = 1, C# = 1.5, D = 2,
+and so on up to B = 6.5. Just a reference readout — same pitch, different
+notation.
+
+
+MASTER VOL
+Linear gain from 0 to 1.0 applied after the NES mixer. 0.8 default leaves
+headroom. No units beyond that — it's a straight multiplier on the output
+sample.
+
+
+P1 / P2 VOL
+Integer values 0–15. This is a 4-bit hardware register — only 16 possible
+loudness levels exist, nothing between them. The NES doesn't have fine-grained
+volume; it has 16 steps. The nonlinear mixer means the difference between
+adjacent steps isn't perceptually equal — the jump from 1→2 is more audible
+than 14→15.
+
+P1 / P2 DUTY
+Three fixed options: 12.5%, 25%, 50%. These describe what fraction of each wave
+cycle the signal spends high versus low. A 50% duty cycle is a true square wave
+— equal time high and low. 25% spends a quarter of the cycle high. 12.5% is an
+eighth. The timbre difference is real: 25% has a hollow, woody quality; 12.5%
+is thin and reedy; 50% is fuller but loses some of the characteristic NES edge.
+
+SHIMMER (P2)
+Cents. One cent is one hundredth of a semitone — there are 100 cents between
+any two adjacent notes on a piano, and 1200 cents in an octave. 7¢ is a very
+small interval, not perceptible as a pitch difference on its own, but when two
+tones are that close together they interfere and produce a beating pattern — a
+slow amplitude fluctuation at the rate of their frequency difference. At A3
+(220 Hz), 7¢ offset produces a beat of roughly 0.9 Hz, or about one pulse per
+second. That slow pulse is the jiva string effect.
+
+
+DRIFT DEPTH
+Cents — peak deviation of the pitch LFO from center. At 8¢ (default) the pitch
+wanders up to 8 cents sharp and 8 cents flat of the target frequency. Since the
+NES period register is an integer, the actual pitch is already slightly off from
+true equal temperament — the drift sits on top of that quantization and masks it
+perceptually. 12¢ (tight max) is just over a tenth of a semitone — audible as
+movement, not as pitch wrongness.
+
+DRIFT SPEED
+Hz — cycles per second of the LFO. 0.13 Hz means one complete drift cycle takes
+about 7.7 seconds. The three-partial LFO structure means the actual contour
+isn't a clean sine — it's a sum of three sinusoids at ratios 1 : 0.55 : 0.37,
+which produces an irregular, non-repeating shape. The tight range of 0.08–0.20
+Hz keeps the cycle between 5 and 12 seconds, which is roughly the timescale of
+a breath or a tanpura stroke.
+
+SWELL
+A fraction from 0 to 1 representing how far the volume can drop from its set
+level. At 0.45 (default), the pulse volume can fall to 55% of its set value at
+the bottom of the swell cycle. Because volume is 4-bit, the actual value is
+rounded to the nearest integer — so at vol=13 with swell=0.45, the bottom of
+the swell is round(13 × 0.55) = 7, and the volume steps between 7 and 13 over
+the cycle. The floor never reaches 0 because the swell multiplier doesn't reach
+zero.
+
+SWELL SPD
+Hz, same as drift speed. 0.18 Hz default is about a 5.5-second cycle —
+slightly faster than drift so the two don't lock in phase.
+
+
+VIBRATO DEPTH
+Cents, peak deviation, applied globally across all three channels as a clean
+sine LFO. Unlike drift (aperiodic, per-channel, slow) this is a regular
+oscillation. 6¢ is the tight maximum — half the shimmer detune, barely
+perceptible as pitch movement but enough to add life if the drone sounds too
+static.
+
+VIBRATO RATE
+Hz. 4–7 Hz tight range. Human vocal vibrato typically sits at 5–6 Hz; sitar
+vibrato is similar. Below 4 Hz the ear starts to track it as deliberate pitch
+movement (andolan territory). Above 7 Hz it starts to sound mechanical or like
+flutter rather than vibrato.
+
+
+WIDE (toggle)
+Extends all the cent and Hz ranges above their practice defaults. No new units
+— just higher ceilings on the same parameters.
