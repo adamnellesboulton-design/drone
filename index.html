@@ -621,7 +621,7 @@ input[type=number]:focus { border-color: var(--teal); }
         <div class="ctrl-row">
           <label>SHIMMER</label>
           <input type="range" id="p2Detune" min="-8" max="10" step="0.5" value="7">
-          <span class="ctrl-val" id="p2DetuneVal">+7¢</span>
+          <span class="ctrl-val" id="p2DetuneVal">+7.0¢</span>
         </div>
         <div class="sep"></div>
         <div class="readout">
@@ -648,7 +648,7 @@ input[type=number]:focus { border-color: var(--teal); }
       <div class="ctrl-row">
         <label>DEPTH</label>
         <input type="range" id="driftDepth" min="0" max="12" step="0.5" value="8">
-        <span class="ctrl-val" id="driftDepthVal">8¢</span>
+        <span class="ctrl-val" id="driftDepthVal">8.0¢</span>
       </div>
       <div class="ctrl-row">
         <label>SPEED</label>
@@ -665,14 +665,14 @@ input[type=number]:focus { border-color: var(--teal); }
         <input type="range" id="swellRate" min="0.08" max="0.20" step="0.01" value="0.18">
         <span class="ctrl-val" id="swellRateVal">0.18</span>
       </div>
-      <p class="hint-text">3-partial LFO per channel at offset rates (×0.93/1.0/×1.07) — channels cross in and out of phase over ~55s cycles. Pulse vol steps through 4-bit NES levels (0–15).</p>
+      <p class="hint-text">3-partial LFO per channel at offset rates (×0.93/1.0/×1.07) — channels cross in and out of phase over ~55s cycles. Pulse vol breathes within 4-bit NES levels (1–15); never fully mutes.</p>
     </div>
     <div>
       <div class="mv-section-label">VIBRATO</div>
       <div class="ctrl-row">
         <label>DEPTH</label>
         <input type="range" id="vibDepth" min="0" max="6" step="0.5" value="0">
-        <span class="ctrl-val" id="vibDepthVal">0¢</span>
+        <span class="ctrl-val" id="vibDepthVal">0.0¢</span>
       </div>
       <div class="ctrl-row">
         <label>RATE</label>
@@ -770,7 +770,7 @@ async function startAudio() {
     numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [1],
   });
 
-  // Analyser tapped before fatten so scope always shows clean NES signal
+  // Analyser tapped before destination so scope shows clean NES signal
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 2048;
   analyser.smoothingTimeConstant = 0.3;
@@ -924,8 +924,8 @@ syncNoteSlider(state.baseSa);
 function applyLinked() {
   const sa = state.baseSa;
   state.triangle.freq = sa / 2;
-  state.pulse1.freq   = sa * RATIOS[state.pulse1.swaraName];
-  state.pulse2.freq   = sa * RATIOS[state.pulse2.swaraName];
+  state.pulse1.freq   = sa * (RATIOS[state.pulse1.swaraName] ?? 1);
+  state.pulse2.freq   = sa * (RATIOS[state.pulse2.swaraName] ?? 1);
 
   document.getElementById('triFreqDisplay').textContent = fmtHz(sa / 2);
   updatePulseDisplay(1);
@@ -982,8 +982,15 @@ function setLinkedMode(on) {
   });
   document.getElementById('p1SwaraGrid').style.display = on ? 'grid' : 'none';
   document.getElementById('p2SwaraGrid').style.display = on ? 'grid' : 'none';
-  if (on) applyLinked();
-  else    updateReadouts();
+  if (on) {
+    applyLinked();
+  } else {
+    // Sync free-freq inputs to current state so they show correct values
+    document.getElementById('triFreq').value = state.triangle.freq.toFixed(3);
+    document.getElementById('p1Freq').value  = state.pulse1.freq.toFixed(3);
+    document.getElementById('p2Freq').value  = state.pulse2.freq.toFixed(3);
+    updateReadouts();
+  }
 }
 
 // ── Swara buttons ──────────────────────────────────────────
@@ -1053,21 +1060,20 @@ function setDomain(wide) {
   Object.entries(cfg).forEach(([id, { min, max, step }]) => {
     const el = document.getElementById(id);
     if (!el) return;
+    const vBefore = parseFloat(el.value);
     el.min  = min;
     el.max  = max;
     el.step = step;
-    // Clamp current value within new range
-    const v = parseFloat(el.value);
-    if (v < min) { el.value = min; el.dispatchEvent(new Event('input')); }
-    if (v > max) { el.value = max; el.dispatchEvent(new Event('input')); }
+    // Browser auto-clamps range value when min/max change; detect by comparing
+    // the value after attribute mutation rather than checking vBefore vs bounds.
+    const vAfter = parseFloat(el.value);
+    if (vAfter !== vBefore) { el.dispatchEvent(new Event('input')); }
   });
   const btn = document.getElementById('domainBtn');
   btn.classList.toggle('active', wide);
   btn.textContent = wide ? 'TIGHT' : 'WIDE';
 }
 document.getElementById('domainBtn').addEventListener('click', () => setDomain(!domainWide));
-// Boot in tight mode
-setDomain(false);
 document.getElementById('stopBtn').addEventListener('click', () => {
   stopAudio();
   document.getElementById('startBtn').style.display = '';
@@ -1094,7 +1100,7 @@ const noteErrEl   = document.getElementById('noteErr');
 function setSa(hz) {
   state.baseSa = hz;
   baseSaEl.value = hz.toFixed(3);
-  noteInputEl.value = hzToNote(hz);
+  if (document.activeElement !== noteInputEl) noteInputEl.value = hzToNote(hz);
   document.getElementById('kattaiBadge').textContent = hzToKattai(hz);
   noteErrEl.style.display = 'none';
   syncNoteSlider(hz);
@@ -1103,7 +1109,7 @@ function setSa(hz) {
 
 noteInputEl.addEventListener('change', () => {
   const hz = noteToHz(noteInputEl.value);
-  if (!hz) { noteErrEl.textContent = '? ' + noteInputEl.value; noteErrEl.style.display = ''; return; }
+  if (!hz) { noteErrEl.textContent = '? ' + noteInputEl.value; noteErrEl.style.display = 'inline'; return; }
   setSa(hz);
 });
 baseSaEl.addEventListener('change', e => {
@@ -1206,6 +1212,9 @@ document.getElementById('vibRate').addEventListener('input', e => {
   sendAll();
 });
 
+// Boot in tight mode — must be after all slider listeners are attached
+setDomain(false);
+
 // ── Presets ────────────────────────────────────────────────
 const PRESETS = {
   'sa-pa':         { p1: 'Sa',  p2: 'Pa',  driftDepth:  8, driftRate: 0.13, swellDepth: 0.45, swellRate: 0.18 },
@@ -1226,18 +1235,18 @@ function applyPreset(id) {
   const pr = PRESETS[id];
   if (!pr) return;
 
-  // Presets always work in linked mode — enable it if needed
-  if (!state.linked) {
-    state.linked = true;
-    document.getElementById('linkedToggle').checked = true;
-    setLinkedMode(true);
-  }
-
-  // Set swaras (match by name string — no float comparison)
+  // Set swaras first so any linked-mode activation uses the correct names
   state.pulse1.swaraName = pr.p1;
   state.pulse2.swaraName = pr.p2;
   applyPresetSwaraToGrid('p1SwaraGrid', pr.p1);
   applyPresetSwaraToGrid('p2SwaraGrid', pr.p2);
+
+  // Presets always work in linked mode — enable it if needed
+  if (!state.linked) {
+    state.linked = true;
+    document.getElementById('linkedToggle').checked = true;
+    setLinkedMode(true); // this calls applyLinked() internally
+  }
 
   // Set movement
   state.driftDepth = pr.driftDepth;
