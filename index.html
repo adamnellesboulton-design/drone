@@ -96,6 +96,21 @@ h1 {
 .btn-stop  { color: var(--red); }
 .btn-stop:hover  { background: #220000; }
 
+.btn-fatten {
+  font-family: var(--font);
+  font-size: 9px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border: 2px solid var(--dim);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  background: #000000;
+  color: var(--dim);
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+}
+.btn-fatten:hover { border-color: var(--orange); color: var(--orange); }
+.btn-fatten.active { background: var(--orange); border-color: var(--orange); color: #000000; }
+
 .sa-group {
   display: flex;
   align-items: center;
@@ -448,6 +463,8 @@ input[type=number]:focus { border-color: var(--teal); }
       <span class="toggle-slider"></span>
     </label>
   </div>
+
+  <button class="btn-fatten" id="fattenBtn">◈ FATTEN</button>
 </div>
 
 <!-- ── Note Slider ────────────────────────────────────────── -->
@@ -744,6 +761,26 @@ const state = {
 
 // ── Audio ──────────────────────────────────────────────────
 let audioCtx = null, workletNode = null, analyser = null;
+let waveShaper = null, fatSplitter = null, fatMerger = null, fatDelay = null;
+let fattenOn = false;
+
+// Tanh saturation curve — precomputed, reused across audio sessions
+const FAT_CURVE = (() => {
+  const n = 512, k = 4;
+  const c = new Float32Array(n);
+  const norm = Math.tanh(k);
+  for (let i = 0; i < n; i++) {
+    c[i] = Math.tanh(k * ((i * 2) / n - 1)) / norm;
+  }
+  return c;
+})();
+
+function setFatten(on) {
+  fattenOn = on;
+  if (waveShaper) waveShaper.curve = on ? FAT_CURVE : null;
+  if (fatDelay)   fatDelay.delayTime.value = on ? 0.015 : 0; // 15ms Haas stereo width
+  document.getElementById('fattenBtn').classList.toggle('active', on);
+}
 
 async function startAudio() {
   if (audioCtx) {
@@ -755,11 +792,28 @@ async function startAudio() {
   workletNode = new AudioWorkletNode(audioCtx, 'nes-processor', {
     numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [1],
   });
+
+  // Analyser tapped before fatten so scope always shows clean NES signal
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 2048;
   analyser.smoothingTimeConstant = 0.3;
+
+  // Fatten chain: saturation → stereo splitter → [direct L, delay R] → merger
+  waveShaper  = audioCtx.createWaveShaper();
+  waveShaper.oversample = '4x';
+  fatSplitter = audioCtx.createChannelSplitter(2);
+  fatMerger   = audioCtx.createChannelMerger(2);
+  fatDelay    = audioCtx.createDelay(0.1);
+
   workletNode.connect(analyser);
-  analyser.connect(audioCtx.destination);
+  analyser.connect(waveShaper);
+  waveShaper.connect(fatSplitter);
+  fatSplitter.connect(fatMerger, 0, 0);   // L: direct
+  fatSplitter.connect(fatDelay,  0);       // R: through delay
+  fatDelay.connect(fatMerger, 0, 1);
+  fatMerger.connect(audioCtx.destination);
+
+  setFatten(fattenOn); // apply current toggle state immediately
   if (audioCtx.state === 'suspended') await audioCtx.resume();
   sendAll();
 }
@@ -784,6 +838,10 @@ function sendAll() {
 function stopAudio() {
   if (workletNode) { workletNode.disconnect(); workletNode = null; }
   if (analyser)    { analyser.disconnect();    analyser    = null; }
+  if (waveShaper)  { waveShaper.disconnect();  waveShaper  = null; }
+  if (fatSplitter) { fatSplitter.disconnect(); fatSplitter = null; }
+  if (fatMerger)   { fatMerger.disconnect();   fatMerger   = null; }
+  if (fatDelay)    { fatDelay.disconnect();    fatDelay    = null; }
   if (audioCtx)    { audioCtx.close();         audioCtx    = null; }
 }
 
@@ -1007,6 +1065,7 @@ document.getElementById('startBtn').addEventListener('click', async () => {
   scopeLabel.className   = 'scope-label live';
   updateReadouts();
 });
+document.getElementById('fattenBtn').addEventListener('click', () => setFatten(!fattenOn));
 document.getElementById('stopBtn').addEventListener('click', () => {
   stopAudio();
   document.getElementById('startBtn').style.display = '';
